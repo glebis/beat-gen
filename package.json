@@ -1,0 +1,31 @@
+{
+  "name": "beat-gen",
+  "version": "1.0.0",
+  "description": "CLI drum machine with AI sample generation and MIDI export",
+  "type": "module",
+  "main": "src/index.js",
+  "bin": {
+    "beat-gen": "./bin/beat-gen.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "drums",
+    "beat",
+    "midi",
+    "cli",
+    "music",
+    "11labs"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@tonejs/midi": "^2.0.28",
+    "audiobuffer-to-wav": "^1.0.0",
+    "chalk": "^5.6.2",
+    "commander": "^14.0.2",
+    "fluent-ffmpeg": "^2.1.3",
+    "node-fetch": "^3.3.2"
+  }
+}

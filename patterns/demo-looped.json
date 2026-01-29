@@ -1,0 +1,92 @@
+{
+  "version": "1.0",
+  "tempo": 120,
+  "timeSignature": "4/4",
+  "resolution": 64,
+  "tracks": [
+    {
+      "name": "kick",
+      "midiNote": 36,
+      "pattern": [
+        { "step": 0, "velocity": 127 },
+        { "step": 4, "velocity": 100 },
+        { "step": 8, "velocity": 127 },
+        { "step": 12, "velocity": 100 },
+        { "step": 16, "velocity": 127 },
+        { "step": 20, "velocity": 100 },
+        { "step": 24, "velocity": 127 },
+        { "step": 28, "velocity": 100 },
+        { "step": 32, "velocity": 127 },
+        { "step": 36, "velocity": 100 },
+        { "step": 40, "velocity": 127 },
+        { "step": 44, "velocity": 100 },
+        { "step": 48, "velocity": 127 },
+        { "step": 52, "velocity": 100 },
+        { "step": 56, "velocity": 127 },
+        { "step": 60, "velocity": 100 }
+      ]
+    },
+    {
+      "name": "snare",
+      "midiNote": 38,
+      "pattern": [
+        { "step": 4, "velocity": 100 },
+        { "step": 12, "velocity": 100 },
+        { "step": 20, "velocity": 100 },
+        { "step": 28, "velocity": 100 },
+        { "step": 36, "velocity": 100 },
+        { "step": 44, "velocity": 100 },
+        { "step": 52, "velocity": 100 },
+        { "step": 60, "velocity": 100 }
+      ]
+    },
+    {
+      "name": "hihat",
+      "midiNote": 42,
+      "pattern": [
+        { "step": 0, "velocity": 80 },
+        { "step": 2, "velocity": 60 },
+        { "step": 4, "velocity": 80 },
+        { "step": 6, "velocity": 60 },
+        { "step": 8, "velocity": 80 },
+        { "step": 10, "velocity": 60 },
+        { "step": 12, "velocity": 80 },
+        { "step": 14, "velocity": 60 },
+        { "step": 16, "velocity": 80 },
+        { "step": 18, "velocity": 60 },
+        { "step": 20, "velocity": 80 },
+        { "step": 22, "velocity": 60 },
+        { "step": 24, "velocity": 80 },
+        { "step": 26, "velocity": 60 },
+        { "step": 28, "velocity": 80 },
+        { "step": 30, "velocity": 60 },
+        { "step": 32, "velocity": 80 },
+        { "step": 34, "velocity": 60 },
+        { "step": 36, "velocity": 80 },
+        { "step": 38, "velocity": 60 },
+        { "step": 40, "velocity": 80 },
+        { "step": 42, "velocity": 60 },
+        { "step": 44, "velocity": 80 },
+        { "step": 46, "velocity": 60 },
+        { "step": 48, "velocity": 80 },
+        { "step": 50, "velocity": 60 },
+        { "step": 52, "velocity": 80 },
+        { "step": 54, "velocity": 60 },
+        { "step": 56, "velocity": 80 },
+        { "step": 58, "velocity": 60 },
+        { "step": 60, "velocity": 80 },
+        { "step": 62, "velocity": 60 }
+      ]
+    },
+    {
+      "name": "hihat-open",
+      "midiNote": 46,
+      "pattern": [
+        { "step": 14, "velocity": 90 },
+        { "step": 30, "velocity": 90 },
+        { "step": 46, "velocity": 90 },
+        { "step": 62, "velocity": 90 }
+      ]
+    }
+  ]
+}

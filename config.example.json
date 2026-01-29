@@ -1,0 +1,44 @@
+{
+  "elevenlabs": {
+    "apiKey": "your_api_key_here",
+    "defaultDuration": 2,
+    "promptInfluence": 0.5
+  },
+  "defaults": {
+    "tempo": 120,
+    "timeSignature": "4/4",
+    "resolution": 16,
+    "swing": 0,
+    "outputDir": "./samples"
+  },
+  "drumKits": {
+    "808": [
+      "808 kick drum",
+      "808 snare drum",
+      "808 closed hi-hat",
+      "808 open hi-hat",
+      "808 rim shot",
+      "808 clap",
+      "808 cowbell"
+    ],
+    "acoustic": [
+      "acoustic kick drum",
+      "acoustic snare drum",
+      "acoustic closed hi-hat",
+      "acoustic open hi-hat",
+      "acoustic tom high",
+      "acoustic tom mid",
+      "acoustic tom low",
+      "acoustic crash cymbal",
+      "acoustic ride cymbal"
+    ],
+    "electronic": [
+      "electronic kick bass",
+      "electronic snare",
+      "electronic hi-hat",
+      "electronic clap",
+      "laser zap",
+      "digital noise hit"
+    ]
+  }
+}

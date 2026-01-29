@@ -1,0 +1,60 @@
+{
+  "version": "1.0",
+  "tempo": 138,
+  "timeSignature": "4/4",
+  "resolution": 64,
+  "tracks": [
+    {
+      "name": "kick",
+      "midiNote": 36,
+      "pattern": [
+        { "step": 0, "velocity": 127 },
+        { "step": 12, "velocity": 110 },
+        { "step": 32, "velocity": 127 },
+        { "step": 42, "velocity": 100 }
+      ]
+    },
+    {
+      "name": "snare",
+      "midiNote": 38,
+      "pattern": [
+        { "step": 8, "velocity": 115 },
+        { "step": 18, "velocity": 90 },
+        { "step": 24, "velocity": 127 },
+        { "step": 40, "velocity": 120 },
+        { "step": 50, "velocity": 95 },
+        { "step": 56, "velocity": 127 }
+      ]
+    },
+    {
+      "name": "hihat",
+      "midiNote": 42,
+      "pattern": [
+        { "step": 0, "velocity": 80 },
+        { "step": 4, "velocity": 60 },
+        { "step": 8, "velocity": 75 },
+        { "step": 12, "velocity": 65 },
+        { "step": 16, "velocity": 80 },
+        { "step": 20, "velocity": 60 },
+        { "step": 24, "velocity": 75 },
+        { "step": 28, "velocity": 65 },
+        { "step": 32, "velocity": 80 },
+        { "step": 36, "velocity": 60 },
+        { "step": 40, "velocity": 75 },
+        { "step": 44, "velocity": 65 },
+        { "step": 48, "velocity": 80 },
+        { "step": 52, "velocity": 60 },
+        { "step": 56, "velocity": 75 },
+        { "step": 60, "velocity": 65 }
+      ]
+    },
+    {
+      "name": "crash",
+      "midiNote": 49,
+      "pattern": [
+        { "step": 0, "velocity": 100 },
+        { "step": 32, "velocity": 95 }
+      ]
+    }
+  ]
+}

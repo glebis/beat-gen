@@ -1,0 +1,8 @@
+node_modules/
+samples/
+*.mid
+*.wav
+*.mp3
+.env
+.DS_Store
+output.*

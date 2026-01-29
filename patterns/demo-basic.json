@@ -1,0 +1,40 @@
+{
+  "version": "1.0",
+  "tempo": 120,
+  "timeSignature": "4/4",
+  "resolution": 16,
+  "tracks": [
+    {
+      "name": "kick",
+      "midiNote": 36,
+      "pattern": [
+        { "step": 0, "velocity": 127 },
+        { "step": 4, "velocity": 100 },
+        { "step": 8, "velocity": 127 },
+        { "step": 12, "velocity": 100 }
+      ]
+    },
+    {
+      "name": "snare",
+      "midiNote": 38,
+      "pattern": [
+        { "step": 4, "velocity": 100 },
+        { "step": 12, "velocity": 100 }
+      ]
+    },
+    {
+      "name": "hihat",
+      "midiNote": 42,
+      "pattern": [
+        { "step": 0, "velocity": 80 },
+        { "step": 2, "velocity": 60 },
+        { "step": 4, "velocity": 80 },
+        { "step": 6, "velocity": 60 },
+        { "step": 8, "velocity": 80 },
+        { "step": 10, "velocity": 60 },
+        { "step": 12, "velocity": 80 },
+        { "step": 14, "velocity": 60 }
+      ]
+    }
+  ]
+}
