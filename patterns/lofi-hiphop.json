@@ -1,0 +1,72 @@
+{
+  "version": "1.0",
+  "name": "Lo-Fi Hip-Hop",
+  "description": "Lazy, dusty beat perfect for studying or relaxing",
+  "tempo": 75,
+  "recommendedTempoRange": "70-85 BPM",
+  "style": "Lo-Fi, Chillhop, Boom Bap",
+  "timeSignature": "4/4",
+  "resolution": 16,
+  "swing": 0.45,
+  "tracks": [
+    {
+      "name": "kick",
+      "midiNote": 36,
+      "pattern": [
+        { "step": 0, "velocity": 100 },
+        { "step": 5, "velocity": 70 },
+        { "step": 10, "velocity": 90 }
+      ]
+    },
+    {
+      "name": "snare",
+      "midiNote": 38,
+      "pattern": [
+        { "step": 4, "velocity": 85 },
+        { "step": 12, "velocity": 90 }
+      ]
+    },
+    {
+      "name": "snare2",
+      "midiNote": 40,
+      "pattern": [
+        { "step": 7, "velocity": 35 },
+        { "step": 15, "velocity": 30 }
+      ]
+    },
+    {
+      "name": "hihat",
+      "midiNote": 42,
+      "pattern": [
+        { "step": 0, "velocity": 60 },
+        { "step": 2, "velocity": 45 },
+        { "step": 4, "velocity": 65 },
+        { "step": 6, "velocity": 40 },
+        { "step": 8, "velocity": 60 },
+        { "step": 10, "velocity": 45 },
+        { "step": 12, "velocity": 65 },
+        { "step": 14, "velocity": 40 }
+      ]
+    },
+    {
+      "name": "hihat-open",
+      "midiNote": 46,
+      "pattern": [
+        { "step": 6, "velocity": 50 },
+        { "step": 14, "velocity": 45 }
+      ]
+    },
+    {
+      "name": "shaker",
+      "midiNote": 82,
+      "pattern": [
+        { "step": 1, "velocity": 25 },
+        { "step": 3, "velocity": 20 },
+        { "step": 5, "velocity": 25 },
+        { "step": 9, "velocity": 20 },
+        { "step": 11, "velocity": 25 },
+        { "step": 13, "velocity": 20 }
+      ]
+    }
+  ]
+}

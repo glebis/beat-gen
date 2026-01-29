@@ -1,0 +1,107 @@
+{
+  "version": "1.0",
+  "name": "Afrobeat Polyrhythm",
+  "description": "West African-inspired polyrhythmic groove with layered percussion",
+  "tempo": 115,
+  "recommendedTempoRange": "105-130 BPM",
+  "style": "Afrobeat, Afro-Cuban, World",
+  "timeSignature": "4/4",
+  "resolution": 32,
+  "swing": 0.1,
+  "tracks": [
+    {
+      "name": "kick",
+      "midiNote": 36,
+      "pattern": [
+        { "step": 0, "velocity": 120 },
+        { "step": 10, "velocity": 90 },
+        { "step": 16, "velocity": 115 },
+        { "step": 24, "velocity": 100 }
+      ]
+    },
+    {
+      "name": "snare",
+      "midiNote": 38,
+      "pattern": [
+        { "step": 8, "velocity": 100 },
+        { "step": 24, "velocity": 105 }
+      ]
+    },
+    {
+      "name": "hihat",
+      "midiNote": 42,
+      "pattern": [
+        { "step": 0, "velocity": 80 },
+        { "step": 4, "velocity": 60 },
+        { "step": 8, "velocity": 80 },
+        { "step": 12, "velocity": 60 },
+        { "step": 16, "velocity": 80 },
+        { "step": 20, "velocity": 60 },
+        { "step": 24, "velocity": 80 },
+        { "step": 28, "velocity": 60 }
+      ]
+    },
+    {
+      "name": "shaker",
+      "midiNote": 82,
+      "pattern": [
+        { "step": 0, "velocity": 50 },
+        { "step": 2, "velocity": 40 },
+        { "step": 4, "velocity": 50 },
+        { "step": 6, "velocity": 40 },
+        { "step": 8, "velocity": 50 },
+        { "step": 10, "velocity": 40 },
+        { "step": 12, "velocity": 50 },
+        { "step": 14, "velocity": 40 },
+        { "step": 16, "velocity": 50 },
+        { "step": 18, "velocity": 40 },
+        { "step": 20, "velocity": 50 },
+        { "step": 22, "velocity": 40 },
+        { "step": 24, "velocity": 50 },
+        { "step": 26, "velocity": 40 },
+        { "step": 28, "velocity": 50 },
+        { "step": 30, "velocity": 40 }
+      ]
+    },
+    {
+      "name": "conga-high",
+      "midiNote": 62,
+      "pattern": [
+        { "step": 6, "velocity": 85 },
+        { "step": 12, "velocity": 70 },
+        { "step": 22, "velocity": 85 },
+        { "step": 28, "velocity": 70 }
+      ]
+    },
+    {
+      "name": "conga-low",
+      "midiNote": 64,
+      "pattern": [
+        { "step": 0, "velocity": 90 },
+        { "step": 10, "velocity": 75 },
+        { "step": 16, "velocity": 90 },
+        { "step": 26, "velocity": 75 }
+      ]
+    },
+    {
+      "name": "cowbell",
+      "midiNote": 56,
+      "pattern": [
+        { "step": 0, "velocity": 70 },
+        { "step": 6, "velocity": 55 },
+        { "step": 12, "velocity": 70 },
+        { "step": 18, "velocity": 55 },
+        { "step": 24, "velocity": 70 },
+        { "step": 30, "velocity": 55 }
+      ]
+    },
+    {
+      "name": "clap",
+      "midiNote": 39,
+      "pattern": [
+        { "step": 8, "velocity": 60 },
+        { "step": 24, "velocity": 55 }
+      ]
+    }
+  ]
+}

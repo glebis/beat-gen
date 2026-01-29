@@ -1,0 +1,69 @@
+{
+  "version": "1.0",
+  "name": "Classic House",
+  "description": "Chicago-style house groove with shuffled hats and punchy kick",
+  "tempo": 122,
+  "recommendedTempoRange": "118-128 BPM",
+  "style": "House, Deep House, Chicago House",
+  "timeSignature": "4/4",
+  "resolution": 16,
+  "swing": 0.25,
+  "tracks": [
+    {
+      "name": "kick",
+      "midiNote": 36,
+      "pattern": [
+        { "step": 0, "velocity": 127 },
+        { "step": 4, "velocity": 120 },
+        { "step": 8, "velocity": 127 },
+        { "step": 12, "velocity": 120 }
+      ]
+    },
+    {
+      "name": "clap",
+      "midiNote": 39,
+      "pattern": [
+        { "step": 4, "velocity": 100 },
+        { "step": 12, "velocity": 95 }
+      ]
+    },
+    {
+      "name": "hihat",
+      "midiNote": 42,
+      "pattern": [
+        { "step": 0, "velocity": 80 },
+        { "step": 2, "velocity": 50 },
+        { "step": 4, "velocity": 80 },
+        { "step": 6, "velocity": 50 },
+        { "step": 8, "velocity": 80 },
+        { "step": 10, "velocity": 50 },
+        { "step": 12, "velocity": 80 },
+        { "step": 14, "velocity": 50 }
+      ]
+    },
+    {
+      "name": "hihat-open",
+      "midiNote": 46,
+      "pattern": [
+        { "step": 2, "velocity": 70 },
+        { "step": 6, "velocity": 65 },
+        { "step": 10, "velocity": 70 },
+        { "step": 14, "velocity": 65 }
+      ]
+    },
+    {
+      "name": "shaker",
+      "midiNote": 82,
+      "pattern": [
+        { "step": 1, "velocity": 40 },
+        { "step": 3, "velocity": 35 },
+        { "step": 5, "velocity": 40 },
+        { "step": 7, "velocity": 35 },
+        { "step": 9, "velocity": 40 },
+        { "step": 11, "velocity": 35 },
+        { "step": 13, "velocity": 40 },
+        { "step": 15, "velocity": 35 }
+      ]
+    }
+  ]
+}

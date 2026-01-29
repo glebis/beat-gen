@@ -1,0 +1,87 @@
+{
+  "version": "1.0",
+  "name": "Bossa Nova",
+  "description": "Brazilian jazz rhythm with characteristic syncopation and soft dynamics",
+  "tempo": 135,
+  "recommendedTempoRange": "120-145 BPM",
+  "style": "Bossa Nova, Jazz, Brazilian",
+  "timeSignature": "4/4",
+  "resolution": 16,
+  "swing": 0,
+  "tracks": [
+    {
+      "name": "kick",
+      "midiNote": 36,
+      "pattern": [
+        { "step": 0, "velocity": 90 },
+        { "step": 6, "velocity": 70 },
+        { "step": 10, "velocity": 85 }
+      ]
+    },
+    {
+      "name": "rimshot",
+      "midiNote": 37,
+      "pattern": [
+        { "step": 2, "velocity": 65 },
+        { "step": 5, "velocity": 55 },
+        { "step": 8, "velocity": 70 },
+        { "step": 11, "velocity": 55 },
+        { "step": 14, "velocity": 65 }
+      ]
+    },
+    {
+      "name": "hihat",
+      "midiNote": 42,
+      "pattern": [
+        { "step": 0, "velocity": 55 },
+        { "step": 2, "velocity": 45 },
+        { "step": 4, "velocity": 55 },
+        { "step": 6, "velocity": 45 },
+        { "step": 8, "velocity": 55 },
+        { "step": 10, "velocity": 45 },
+        { "step": 12, "velocity": 55 },
+        { "step": 14, "velocity": 45 }
+      ]
+    },
+    {
+      "name": "hihat-open",
+      "midiNote": 46,
+      "pattern": [
+        { "step": 3, "velocity": 40 },
+        { "step": 7, "velocity": 35 },
+        { "step": 11, "velocity": 40 },
+        { "step": 15, "velocity": 35 }
+      ]
+    },
+    {
+      "name": "shaker",
+      "midiNote": 82,
+      "pattern": [
+        { "step": 0, "velocity": 35 },
+        { "step": 1, "velocity": 25 },
+        { "step": 2, "velocity": 35 },
+        { "step": 3, "velocity": 25 },
+        { "step": 4, "velocity": 35 },
+        { "step": 5, "velocity": 25 },
+        { "step": 6, "velocity": 35 },
+        { "step": 7, "velocity": 25 },
+        { "step": 8, "velocity": 35 },
+        { "step": 9, "velocity": 25 },
+        { "step": 10, "velocity": 35 },
+        { "step": 11, "velocity": 25 },
+        { "step": 12, "velocity": 35 },
+        { "step": 13, "velocity": 25 },
+        { "step": 14, "velocity": 35 },
+        { "step": 15, "velocity": 25 }
+      ]
+    },
+    {
+      "name": "tambourine",
+      "midiNote": 54,
+      "pattern": [
+        { "step": 4, "velocity": 40 },
+        { "step": 12, "velocity": 35 }
+      ]
+    }
+  ]
+}

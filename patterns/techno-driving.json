@@ -1,0 +1,65 @@
+{
+  "version": "1.0",
+  "name": "Driving Techno",
+  "description": "Classic techno four-on-the-floor with relentless energy",
+  "tempo": 130,
+  "recommendedTempoRange": "125-135 BPM",
+  "style": "Techno, Industrial, Rave",
+  "timeSignature": "4/4",
+  "resolution": 32,
+  "swing": 0,
+  "tracks": [
+    {
+      "name": "kick",
+      "midiNote": 36,
+      "pattern": [
+        { "step": 0, "velocity": 127 },
+        { "step": 8, "velocity": 127 },
+        { "step": 16, "velocity": 127 },
+        { "step": 24, "velocity": 127 }
+      ]
+    },
+    {
+      "name": "clap",
+      "midiNote": 39,
+      "pattern": [
+        { "step": 8, "velocity": 100 },
+        { "step": 24, "velocity": 100 }
+      ]
+    },
+    {
+      "name": "hihat",
+      "midiNote": 42,
+      "pattern": [
+        { "step": 0, "velocity": 70 },
+        { "step": 4, "velocity": 90 },
+        { "step": 8, "velocity": 70 },
+        { "step": 12, "velocity": 90 },
+        { "step": 16, "velocity": 70 },
+        { "step": 20, "velocity": 90 },
+        { "step": 24, "velocity": 70 },
+        { "step": 28, "velocity": 90 }
+      ]
+    },
+    {
+      "name": "hihat-open",
+      "midiNote": 46,
+      "pattern": [
+        { "step": 4, "velocity": 60 },
+        { "step": 12, "velocity": 50 },
+        { "step": 20, "velocity": 60 },
+        { "step": 28, "velocity": 50 }
+      ]
+    },
+    {
+      "name": "ride",
+      "midiNote": 51,
+      "pattern": [
+        { "step": 2, "velocity": 40 },
+        { "step": 10, "velocity": 35 },
+        { "step": 18, "velocity": 40 },
+        { "step": 26, "velocity": 35 }
+      ]
+    }
+  ]
+}

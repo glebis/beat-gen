@@ -1,0 +1,73 @@
+{
+  "version": "1.0",
+  "name": "Jungle DnB",
+  "description": "Fast breakbeat pattern with syncopated kicks and chopped-up feel",
+  "tempo": 174,
+  "recommendedTempoRange": "170-180 BPM",
+  "style": "Drum and Bass, Jungle, Breakbeat",
+  "timeSignature": "4/4",
+  "resolution": 32,
+  "swing": 0,
+  "tracks": [
+    {
+      "name": "kick",
+      "midiNote": 36,
+      "pattern": [
+        { "step": 0, "velocity": 127 },
+        { "step": 10, "velocity": 100 },
+        { "step": 16, "velocity": 110 },
+        { "step": 22, "velocity": 95 },
+        { "step": 28, "velocity": 105 }
+      ]
+    },
+    {
+      "name": "snare",
+      "midiNote": 38,
+      "pattern": [
+        { "step": 8, "velocity": 120 },
+        { "step": 24, "velocity": 120 }
+      ]
+    },
+    {
+      "name": "snare2",
+      "midiNote": 40,
+      "pattern": [
+        { "step": 6, "velocity": 60 },
+        { "step": 14, "velocity": 55 },
+        { "step": 30, "velocity": 65 }
+      ]
+    },
+    {
+      "name": "hihat",
+      "midiNote": 42,
+      "pattern": [
+        { "step": 0, "velocity": 80 },
+        { "step": 4, "velocity": 70 },
+        { "step": 8, "velocity": 80 },
+        { "step": 12, "velocity": 70 },
+        { "step": 16, "velocity": 80 },
+        { "step": 20, "velocity": 70 },
+        { "step": 24, "velocity": 80 },
+        { "step": 28, "velocity": 70 }
+      ]
+    },
+    {
+      "name": "hihat-open",
+      "midiNote": 46,
+      "pattern": [
+        { "step": 2, "velocity": 50 },
+        { "step": 18, "velocity": 55 }
+      ]
+    },
+    {
+      "name": "ride",
+      "midiNote": 51,
+      "pattern": [
+        { "step": 4, "velocity": 60 },
+        { "step": 12, "velocity": 55 },
+        { "step": 20, "velocity": 60 },
+        { "step": 28, "velocity": 55 }
+      ]
+    }
+  ]
+}

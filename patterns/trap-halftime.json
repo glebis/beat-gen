@@ -1,0 +1,96 @@
+{
+  "version": "1.0",
+  "name": "Trap Half-Time",
+  "description": "Modern trap beat with rolling hi-hats and heavy 808 kick",
+  "tempo": 140,
+  "recommendedTempoRange": "130-160 BPM (half-time feel)",
+  "style": "Trap, Hip-Hop, EDM Trap",
+  "timeSignature": "4/4",
+  "resolution": 64,
+  "swing": 0,
+  "tracks": [
+    {
+      "name": "kick",
+      "midiNote": 36,
+      "pattern": [
+        { "step": 0, "velocity": 127 },
+        { "step": 24, "velocity": 100 },
+        { "step": 44, "velocity": 110 }
+      ]
+    },
+    {
+      "name": "snare",
+      "midiNote": 38,
+      "pattern": [
+        { "step": 16, "velocity": 120 },
+        { "step": 48, "velocity": 125 }
+      ]
+    },
+    {
+      "name": "clap",
+      "midiNote": 39,
+      "pattern": [
+        { "step": 16, "velocity": 90 },
+        { "step": 48, "velocity": 95 }
+      ]
+    },
+    {
+      "name": "hihat",
+      "midiNote": 42,
+      "pattern": [
+        { "step": 0, "velocity": 80 },
+        { "step": 4, "velocity": 70 },
+        { "step": 8, "velocity": 80 },
+        { "step": 10, "velocity": 60 },
+        { "step": 12, "velocity": 75 },
+        { "step": 14, "velocity": 65 },
+        { "step": 16, "velocity": 80 },
+        { "step": 18, "velocity": 55 },
+        { "step": 20, "velocity": 70 },
+        { "step": 22, "velocity": 60 },
+        { "step": 24, "velocity": 80 },
+        { "step": 26, "velocity": 50 },
+        { "step": 28, "velocity": 75 },
+        { "step": 29, "velocity": 45 },
+        { "step": 30, "velocity": 70 },
+        { "step": 31, "velocity": 50 },
+        { "step": 32, "velocity": 80 },
+        { "step": 34, "velocity": 55 },
+        { "step": 36, "velocity": 75 },
+        { "step": 38, "velocity": 60 },
+        { "step": 40, "velocity": 80 },
+        { "step": 42, "velocity": 50 },
+        { "step": 44, "velocity": 75 },
+        { "step": 46, "velocity": 55 },
+        { "step": 48, "velocity": 80 },
+        { "step": 50, "velocity": 60 },
+        { "step": 52, "velocity": 75 },
+        { "step": 54, "velocity": 50 },
+        { "step": 56, "velocity": 80 },
+        { "step": 57, "velocity": 45 },
+        { "step": 58, "velocity": 70 },
+        { "step": 59, "velocity": 50 },
+        { "step": 60, "velocity": 75 },
+        { "step": 61, "velocity": 55 },
+        { "step": 62, "velocity": 80 },
+        { "step": 63, "velocity": 60 }
+      ]
+    },
+    {
+      "name": "hihat-open",
+      "midiNote": 46,
+      "pattern": [
+        { "step": 8, "velocity": 65 },
+        { "step": 40, "velocity": 60 }
+      ]
+    },
+    {
+      "name": "rimshot",
+      "midiNote": 37,
+      "pattern": [
+        { "step": 28, "velocity": 50 },
+        { "step": 60, "velocity": 55 }
+      ]
+    }
+  ]
+}

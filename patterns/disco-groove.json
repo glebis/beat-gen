@@ -1,0 +1,83 @@
+{
+  "version": "1.0",
+  "name": "Disco Groove",
+  "description": "70s-inspired disco beat with four-on-the-floor and open hats",
+  "tempo": 120,
+  "recommendedTempoRange": "115-125 BPM",
+  "style": "Disco, Nu-Disco, Funk",
+  "timeSignature": "4/4",
+  "resolution": 16,
+  "swing": 0,
+  "tracks": [
+    {
+      "name": "kick",
+      "midiNote": 36,
+      "pattern": [
+        { "step": 0, "velocity": 127 },
+        { "step": 4, "velocity": 120 },
+        { "step": 8, "velocity": 127 },
+        { "step": 12, "velocity": 120 }
+      ]
+    },
+    {
+      "name": "snare",
+      "midiNote": 38,
+      "pattern": [
+        { "step": 4, "velocity": 110 },
+        { "step": 12, "velocity": 110 }
+      ]
+    },
+    {
+      "name": "hihat",
+      "midiNote": 42,
+      "pattern": [
+        { "step": 0, "velocity": 90 },
+        { "step": 4, "velocity": 90 },
+        { "step": 8, "velocity": 90 },
+        { "step": 12, "velocity": 90 }
+      ]
+    },
+    {
+      "name": "hihat-open",
+      "midiNote": 46,
+      "pattern": [
+        { "step": 2, "velocity": 100 },
+        { "step": 6, "velocity": 95 },
+        { "step": 10, "velocity": 100 },
+        { "step": 14, "velocity": 95 }
+      ]
+    },
+    {
+      "name": "clap",
+      "midiNote": 39,
+      "pattern": [
+        { "step": 4, "velocity": 80 },
+        { "step": 12, "velocity": 75 }
+      ]
+    },
+    {
+      "name": "tambourine",
+      "midiNote": 54,
+      "pattern": [
+        { "step": 0, "velocity": 50 },
+        { "step": 2, "velocity": 60 },
+        { "step": 4, "velocity": 50 },
+        { "step": 6, "velocity": 60 },
+        { "step": 8, "velocity": 50 },
+        { "step": 10, "velocity": 60 },
+        { "step": 12, "velocity": 50 },
+        { "step": 14, "velocity": 60 }
+      ]
+    },
+    {
+      "name": "cowbell",
+      "midiNote": 56,
+      "pattern": [
+        { "step": 0, "velocity": 45 },
+        { "step": 4, "velocity": 40 },
+        { "step": 8, "velocity": 45 },
+        { "step": 12, "velocity": 40 }
+      ]
+    }
+  ]
+}

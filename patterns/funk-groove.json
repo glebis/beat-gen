@@ -1,0 +1,81 @@
+{
+  "version": "1.0",
+  "name": "Funky Groove",
+  "description": "Tight funk pattern with ghost notes and syncopated kick",
+  "tempo": 100,
+  "recommendedTempoRange": "95-110 BPM",
+  "style": "Funk, Soul, R&B",
+  "timeSignature": "4/4",
+  "resolution": 32,
+  "swing": 0.15,
+  "tracks": [
+    {
+      "name": "kick",
+      "midiNote": 36,
+      "pattern": [
+        { "step": 0, "velocity": 127 },
+        { "step": 6, "velocity": 90 },
+        { "step": 10, "velocity": 100 },
+        { "step": 16, "velocity": 120 },
+        { "step": 20, "velocity": 85 },
+        { "step": 26, "velocity": 95 }
+      ]
+    },
+    {
+      "name": "snare",
+      "midiNote": 38,
+      "pattern": [
+        { "step": 8, "velocity": 110 },
+        { "step": 24, "velocity": 115 }
+      ]
+    },
+    {
+      "name": "snare2",
+      "midiNote": 40,
+      "pattern": [
+        { "step": 5, "velocity": 40 },
+        { "step": 13, "velocity": 35 },
+        { "step": 21, "velocity": 40 },
+        { "step": 29, "velocity": 45 }
+      ]
+    },
+    {
+      "name": "hihat",
+      "midiNote": 42,
+      "pattern": [
+        { "step": 0, "velocity": 90 },
+        { "step": 4, "velocity": 60 },
+        { "step": 8, "velocity": 90 },
+        { "step": 12, "velocity": 60 },
+        { "step": 16, "velocity": 90 },
+        { "step": 20, "velocity": 60 },
+        { "step": 24, "velocity": 90 },
+        { "step": 28, "velocity": 60 }
+      ]
+    },
+    {
+      "name": "hihat-open",
+      "midiNote": 46,
+      "pattern": [
+        { "step": 14, "velocity": 75 },
+        { "step": 30, "velocity": 70 }
+      ]
+    },
+    {
+      "name": "clap",
+      "midiNote": 39,
+      "pattern": [
+        { "step": 8, "velocity": 70 },
+        { "step": 24, "velocity": 65 }
+      ]
+    },
+    {
+      "name": "cowbell",
+      "midiNote": 56,
+      "pattern": [
+        { "step": 2, "velocity": 50 },
+        { "step": 18, "velocity": 45 }
+      ]
+    }
+  ]
+}
