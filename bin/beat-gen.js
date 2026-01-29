@@ -7,6 +7,7 @@ import { composeCommand } from '../src/cli/commands/compose.js';
 import { exportCommand } from '../src/cli/commands/export.js';
 import { importCommand } from '../src/cli/commands/import.js';
 import { renderCommand } from '../src/cli/commands/render.js';
+import { interactiveCommand } from '../src/cli/commands/interactive.js';
 
 const program = new Command();
 
@@ -70,6 +71,13 @@ program
   .option('--format <format>', 'Output format', 'wav')
   .action(renderCommand);
 
+// Interactive command
+program
+  .command('interactive')
+  .alias('i')
+  .description('Interactive beat creation wizard - step-by-step guided workflow')
+  .action(interactiveCommand);
+
 // Help examples
 program.addHelpText('after', `
 ${chalk.cyan('Examples:')}
@@ -100,6 +108,10 @@ ${chalk.cyan('Examples:')}
 
   ${chalk.gray('# Render pattern to WAV with samples')}
   $ beat-gen render pattern.json --samples ./samples/808/ --output beat.wav
+
+  ${chalk.gray('# Start interactive beat creation wizard')}
+  $ beat-gen interactive
+  $ beat-gen i
 
 ${chalk.yellow('Environment Variables:')}
   ELEVENLABS_API_KEY    Your 11Labs API key for sample generation

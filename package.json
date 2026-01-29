@@ -21,6 +21,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@inquirer/prompts": "^8.2.0",
     "@tonejs/midi": "^2.0.28",
     "audiobuffer-to-wav": "^1.0.0",
     "chalk": "^5.6.2",
