@@ -7,6 +7,7 @@ import { composeCommand } from '../src/cli/commands/compose.js';
 import { exportCommand } from '../src/cli/commands/export.js';
 import { importCommand } from '../src/cli/commands/import.js';
 import { renderCommand } from '../src/cli/commands/render.js';
+import { initCommand } from '../src/cli/commands/init.js';
 
 const program = new Command();
 
@@ -14,6 +15,14 @@ program
   .name('beat-gen')
   .description('CLI drum machine with AI sample generation and MIDI export')
   .version('1.0.0');
+
+// Init command - setup wizard
+program
+  .command('init')
+  .description('Interactive setup wizard for first-time configuration')
+  .option('-f, --force', 'Overwrite existing configuration')
+  .option('-y, --yes', 'Non-interactive mode with defaults')
+  .action(initCommand);
 
 // Sample generation command
 program
@@ -72,6 +81,11 @@ program
 
 // Help examples
 program.addHelpText('after', `
+${chalk.cyan('Getting Started:')}
+
+  ${chalk.gray('# First time setup wizard')}
+  $ beat-gen init
+
 ${chalk.cyan('Examples:')}
 
   ${chalk.gray('# Generate single sample')}
