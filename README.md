@@ -331,6 +331,32 @@ beat-gen sample "kick" --api-key your_api_key_here
 
 ## Technical Details
 
+### Project Structure
+
+```
+beat-gen/
+├── bin/
+│   └── beat-gen.js              # CLI entry point
+├── src/
+│   ├── cli/commands/            # Command implementations
+│   │   ├── sample.js            # AI sample generation
+│   │   ├── compose.js           # Pattern to MIDI
+│   │   ├── export.js            # JSON to MIDI/text
+│   │   ├── import.js            # MIDI to JSON/text
+│   │   └── render.js            # WAV rendering
+│   ├── core/
+│   │   └── pattern-parser.js    # Pattern parsing & swing
+│   ├── services/
+│   │   ├── midi-service.js      # MIDI read/write
+│   │   ├── elevenlabs-service.js # 11Labs API
+│   │   └── audio-renderer.js    # FFmpeg mixing
+│   └── utils/
+│       └── gm-drum-map.js       # GM drum mapping
+├── patterns/                     # Example patterns
+├── CLAUDE.md                     # Development guide
+└── package.json
+```
+
 ### Architecture
 
 - **Pattern Parser** - Text and JSON notation support

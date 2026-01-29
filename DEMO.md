@@ -24,7 +24,7 @@ source ~/.bashrc
 ### 3. Generate Real Drum Kit
 
 ```bash
-cd ~/ai_projects/beat-gen
+cd beat-gen
 
 # Generate 808 kit with real AI samples
 beat-gen sample --kit 808 --output samples/808
@@ -61,7 +61,7 @@ samples/test/
 ## Play Demo Beat
 
 ```bash
-cd ~/ai_projects/beat-gen
+cd beat-gen
 
 # macOS
 afplay beat.wav

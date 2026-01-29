@@ -3,7 +3,8 @@
 ## Installation
 
 ```bash
-cd ~/ai_projects/beat-gen
+# Clone or download the project, then:
+cd beat-gen
 npm install
 npm link
 ```
