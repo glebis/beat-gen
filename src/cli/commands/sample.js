@@ -1,5 +1,6 @@
 import chalk from 'chalk';
 import { generateSample, generateBatchSamples, generateDrumKit } from '../../services/elevenlabs-service.js';
+import { getElevenLabsApiKey } from '../../utils/config.js';
 
 /**
  * Sample generation command
@@ -7,12 +8,20 @@ import { generateSample, generateBatchSamples, generateDrumKit } from '../../ser
 export async function sampleCommand(prompts, options) {
   console.log(chalk.cyan('🎵 Beat-Gen Sample Generator\n'));
 
-  // Check for API key
-  if (!options.apiKey && !process.env.ELEVENLABS_API_KEY) {
+  // Check for API key (CLI option > config.json > environment)
+  const apiKey = getElevenLabsApiKey(options.apiKey);
+
+  if (!apiKey) {
     console.error(chalk.red('Error: 11Labs API key required'));
-    console.log(chalk.yellow('Set ELEVENLABS_API_KEY environment variable or use --api-key option'));
+    console.log(chalk.yellow('Options:'));
+    console.log(chalk.yellow('  1. Set in config.json: { "elevenlabs": { "apiKey": "sk_..." } }'));
+    console.log(chalk.yellow('  2. Set ELEVENLABS_API_KEY environment variable'));
+    console.log(chalk.yellow('  3. Use --api-key option'));
     process.exit(1);
   }
+
+  // Override options with API key from config
+  options.apiKey = apiKey;
 
   // Generate drum kit if kit option provided
   if (options.kit) {
