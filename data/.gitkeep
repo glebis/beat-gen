@@ -1,0 +1,13 @@
+# This directory structure should be committed
+# But most content is gitignored (see ../.gitignore)
+#
+# Committed:
+# - README.md
+# - example-patterns/
+# - demo-patterns/
+# - .gitkeep files
+#
+# Gitignored:
+# - generated-patterns/ (169 files, 644KB)
+# - audio-samples/ (10 files, 13MB)
+# - output/

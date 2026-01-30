@@ -80,12 +80,18 @@ export function parseJSONPattern(json) {
     };
   });
 
+  // Determine tempo: data.tempo > metadata.suggestedBPM > undefined (let caller decide)
+  const tempo = data.tempo !== undefined ? data.tempo :
+                data.metadata?.suggestedBPM !== undefined ? data.metadata.suggestedBPM :
+                undefined;
+
   return {
-    tempo: data.tempo || 120,
+    tempo,
     timeSignature: data.timeSignature || '4/4',
     resolution: data.resolution || 16, // 16th notes by default
     swing: data.swing || 0,
     tracks,
+    metadata: data.metadata, // Preserve metadata
   };
 }
 

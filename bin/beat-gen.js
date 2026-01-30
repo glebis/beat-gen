@@ -7,6 +7,7 @@ import { composeCommand } from '../src/cli/commands/compose.js';
 import { exportCommand } from '../src/cli/commands/export.js';
 import { importCommand } from '../src/cli/commands/import.js';
 import { renderCommand } from '../src/cli/commands/render.js';
+import { generateCommand } from '../src/cli/commands/generate.js';
 
 const program = new Command();
 
@@ -32,7 +33,7 @@ program
   .command('compose')
   .description('Create beats from patterns')
   .argument('[pattern]', 'Pattern file (.json, .txt) or inline text pattern')
-  .option('-b, --bpm <tempo>', 'Tempo in BPM', '120')
+  .option('-b, --bpm <tempo>', 'Tempo in BPM (defaults to pattern suggestedBPM or 120)')
   .option('-t, --time-signature <sig>', 'Time signature', '4/4')
   .option('-s, --swing <amount>', 'Swing amount (0-1)', '0')
   .option('-r, --resolution <steps>', 'Steps per pattern (16, 32, etc)', '16')
@@ -73,6 +74,19 @@ program
   .option('--format <format>', 'Output format', 'wav')
   .action(renderCommand);
 
+// Generate command
+program
+  .command('generate')
+  .description('Generate pattern library')
+  .argument('[genre]', 'Genre to generate (house, techno, dnb, etc.)')
+  .option('-c, --count <number>', 'Number of patterns per genre', '5')
+  .option('-w, --with-variations', 'Generate intro/outro/fill variations', true)
+  .option('-o, --output <dir>', 'Output directory', './patterns/library')
+  .option('-a, --all', 'Generate all genres')
+  .option('-l, --list', 'List available genres')
+  .option('-v, --variability', 'Add ghost notes and humanization')
+  .action(generateCommand);
+
 // Help examples
 program.addHelpText('after', `
 ${chalk.cyan('Examples:')}
@@ -103,6 +117,11 @@ ${chalk.cyan('Examples:')}
 
   ${chalk.gray('# Render pattern to WAV with samples')}
   $ beat-gen render pattern.json --samples ./samples/808/ --output beat.wav
+
+  ${chalk.gray('# Generate pattern library')}
+  $ beat-gen generate house --count 5
+  $ beat-gen generate --all --count 10
+  $ beat-gen generate --list
 
 ${chalk.yellow('Environment Variables:')}
   ELEVENLABS_API_KEY    Your 11Labs API key for sample generation

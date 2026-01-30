@@ -32,17 +32,17 @@ beat-gen compose my-first-beat.txt --bpm 120 --output my-beat.mid
 
 ```bash
 # Hip-hop groove
-beat-gen compose patterns/example-hiphop.txt --bpm 95 --output hiphop.mid
+beat-gen compose data/example-patterns/example-hiphop.txt --bpm 95 --output hiphop.mid
 
 # Advanced pattern with JSON
-beat-gen compose patterns/example-advanced.json --output advanced.mid
+beat-gen compose data/example-patterns/example-advanced.json --output advanced.mid
 ```
 
 ### 3. Add Swing
 
 ```bash
 # Apply 50% swing for groove
-beat-gen compose patterns/example-basic.txt --swing 0.5 --bpm 100 --output groovy.mid
+beat-gen compose data/example-patterns/example-basic.txt --swing 0.5 --bpm 100 --output groovy.mid
 ```
 
 ### 4. Import Existing MIDI
@@ -125,7 +125,7 @@ See `src/utils/gm-drum-map.js` for complete list.
 
 ## Next Steps
 
-- Explore example patterns in `patterns/`
+- Explore example patterns in `data/example-patterns/`
 - Read full docs in `README.md`
 - Check GM drum map for all available drums
 - Combine with your DAW for production

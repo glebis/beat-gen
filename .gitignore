@@ -1,8 +1,50 @@
+# Dependencies
 node_modules/
-samples/
-*.mid
-*.wav
-*.mp3
-.env
-.DS_Store
+
+# Generated patterns (can be regenerated with `beat generate`)
+data/generated-patterns/
+patterns/library/
+
+# Output files
+data/output/*
+!data/output/.gitkeep
 output.*
+*.wav
+*.mid
+*.mp3
+
+# Sample packs (user-provided)
+samples/
+
+# Environment & config
+.env
+config.json
+
+# OS files
+.DS_Store
+
+# Build artifacts
+dist/
+build/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Test artifacts
+coverage/
+.nyc_output/
+
+# Temporary files
+tmp/
+temp/
+*.tmp

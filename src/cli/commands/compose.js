@@ -78,9 +78,14 @@ export async function composeCommand(patternInput, options) {
     pattern = applySwing(pattern, options.swing);
   }
 
-  // Override tempo if specified
+  // Determine tempo: CLI flag > pattern.tempo > metadata.suggestedBPM > default 120
   if (options.bpm) {
     pattern.tempo = options.bpm;
+  } else if (!pattern.tempo && pattern.metadata?.suggestedBPM) {
+    pattern.tempo = pattern.metadata.suggestedBPM;
+    log.verbose(`Using suggested BPM from pattern: ${pattern.tempo}`);
+  } else if (!pattern.tempo) {
+    pattern.tempo = 120;
   }
 
   // Print pattern info (to stderr in verbose mode)

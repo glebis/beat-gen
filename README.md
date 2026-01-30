@@ -47,7 +47,7 @@ beat-gen sample --kit electronic
 
 ```bash
 # Create beat from text pattern file
-beat-gen compose patterns/example-basic.txt --bpm 120 --output my-beat.mid
+beat-gen compose data/example-patterns/example-basic.txt --bpm 120 --output my-beat.mid
 
 # Create beat with inline pattern
 beat-gen compose --pattern "kick: X...X...X...X...
@@ -360,3 +360,26 @@ MIT
 ## Contributing
 
 Issues and PRs welcome at: https://github.com/glebis/beat-gen
+
+## 📁 Project Structure
+
+```
+beat-gen/
+├── src/                    # Source code
+│   ├── cli/               # Command implementations
+│   ├── core/              # Pattern parser
+│   ├── generators/        # Pattern generation
+│   ├── services/          # MIDI & audio services
+│   └── utils/             # Utilities
+├── data/                   # Runtime data (mostly gitignored)
+│   ├── generated-patterns/ # Auto-generated patterns
+│   ├── example-patterns/   # Learning templates
+│   ├── demo-patterns/      # Hand-crafted demos
+│   └── output/            # CLI output
+├── docs/                   # Documentation
+├── scripts/               # Utility scripts
+└── bin/                   # CLI entry point
+```
+
+See [docs/STRUCTURE.md](docs/STRUCTURE.md) for detailed architecture.
+
