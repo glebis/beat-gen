@@ -36,8 +36,11 @@ program
   .option('-t, --time-signature <sig>', 'Time signature', '4/4')
   .option('-s, --swing <amount>', 'Swing amount (0-1)', '0')
   .option('-r, --resolution <steps>', 'Steps per pattern (16, 32, etc)', '16')
-  .option('-o, --output <file>', 'Output MIDI file', 'output.mid')
+  .option('-o, --output <file>', 'Output file (use - for stdout)', 'output.mid')
+  .option('-f, --format <format>', 'Output format (midi, json)', 'midi')
   .option('-p, --pattern <text>', 'Inline text pattern')
+  .option('-q, --quiet', 'Quiet mode (no progress output)')
+  .option('-v, --verbose', 'Verbose mode (debug info)')
   .action(composeCommand);
 
 // Export command

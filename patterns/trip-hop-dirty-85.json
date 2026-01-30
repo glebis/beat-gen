@@ -1,0 +1,96 @@
+{
+  "version": "1.0",
+  "tempo": 85,
+  "timeSignature": "4/4",
+  "resolution": 64,
+  "tracks": [
+    {
+      "name": "kick",
+      "midiNote": 36,
+      "pattern": [
+        { "step": 0, "velocity": 127 },
+        { "step": 5, "velocity": 100 },
+        { "step": 13, "velocity": 90 },
+        { "step": 18, "velocity": 110 },
+        { "step": 32, "velocity": 127 },
+        { "step": 37, "velocity": 95 },
+        { "step": 45, "velocity": 85 },
+        { "step": 50, "velocity": 105 }
+      ]
+    },
+    {
+      "name": "snare",
+      "midiNote": 38,
+      "pattern": [
+        { "step": 14, "velocity": 110 },
+        { "step": 15, "velocity": 70 },
+        { "step": 30, "velocity": 105 },
+        { "step": 46, "velocity": 115 },
+        { "step": 47, "velocity": 75 },
+        { "step": 62, "velocity": 100 }
+      ]
+    },
+    {
+      "name": "hihat",
+      "midiNote": 42,
+      "pattern": [
+        { "step": 0, "velocity": 65 },
+        { "step": 3, "velocity": 45 },
+        { "step": 7, "velocity": 70 },
+        { "step": 10, "velocity": 50 },
+        { "step": 13, "velocity": 60 },
+        { "step": 17, "velocity": 75 },
+        { "step": 20, "velocity": 55 },
+        { "step": 23, "velocity": 65 },
+        { "step": 27, "velocity": 50 },
+        { "step": 32, "velocity": 70 },
+        { "step": 35, "velocity": 45 },
+        { "step": 39, "velocity": 65 },
+        { "step": 42, "velocity": 50 },
+        { "step": 45, "velocity": 60 },
+        { "step": 49, "velocity": 75 },
+        { "step": 52, "velocity": 55 },
+        { "step": 55, "velocity": 65 },
+        { "step": 59, "velocity": 50 }
+      ]
+    },
+    {
+      "name": "hihat-open",
+      "midiNote": 46,
+      "pattern": [
+        { "step": 11, "velocity": 90 },
+        { "step": 27, "velocity": 85 },
+        { "step": 43, "velocity": 90 },
+        { "step": 59, "velocity": 80 }
+      ]
+    },
+    {
+      "name": "rimshot",
+      "midiNote": 37,
+      "pattern": [
+        { "step": 8, "velocity": 75 },
+        { "step": 24, "velocity": 70 },
+        { "step": 40, "velocity": 75 },
+        { "step": 56, "velocity": 65 }
+      ]
+    },
+    {
+      "name": "clap",
+      "midiNote": 39,
+      "pattern": [
+        { "step": 16, "velocity": 95 },
+        { "step": 17, "velocity": 60 },
+        { "step": 48, "velocity": 100 },
+        { "step": 49, "velocity": 65 }
+      ]
+    },
+    {
+      "name": "crash",
+      "midiNote": 49,
+      "pattern": [
+        { "step": 0, "velocity": 100 },
+        { "step": 32, "velocity": 90 }
+      ]
+    }
+  ]
+}
