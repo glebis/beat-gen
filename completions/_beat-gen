@@ -1,0 +1,76 @@
+#compdef beat-gen
+
+# Zsh completion for beat-gen CLI
+
+_beat-gen() {
+  local context state line
+  typeset -A opt_args
+
+  _arguments -C \
+    '1: :->command' \
+    '*::arg:->args' \
+    '--help[Show help]' \
+    '--version[Show version]'
+
+  case $state in
+    command)
+      _arguments '1:command:(sample compose export import render help)'
+      ;;
+    args)
+      case $line[1] in
+        sample)
+          _arguments \
+            '(-k --kit)'{-k,--kit}'[Drum kit preset]:kit:(808 acoustic electronic)' \
+            '(-o --output)'{-o,--output}'[Output directory]:directory:_files -/' \
+            '(-d --duration)'{-d,--duration}'[Sample duration]:seconds:' \
+            '(-i --influence)'{-i,--influence}'[Prompt influence]:value:(0 0.3 0.5 0.7 1)' \
+            '--api-key[11Labs API key]:key:' \
+            '(-q --quiet)'{-q,--quiet}'[Quiet mode]' \
+            '(-v --verbose)'{-v,--verbose}'[Verbose mode]' \
+            '*:prompt:'
+          ;;
+        compose)
+          _arguments \
+            '(-b --bpm)'{-b,--bpm}'[Tempo in BPM]:bpm:' \
+            '(-t --time-signature)'{-t,--time-signature}'[Time signature]:signature:(4/4 3/4 6/8 7/8)' \
+            '(-s --swing)'{-s,--swing}'[Swing amount]:amount:(0 0.3 0.5 0.66)' \
+            '(-r --resolution)'{-r,--resolution}'[Steps per pattern]:steps:(16 32 64)' \
+            '(-o --output)'{-o,--output}'[Output file]:file:_files -g "*.mid"' \
+            '(-f --format)'{-f,--format}'[Output format]:format:(midi json)' \
+            '(-q --quiet)'{-q,--quiet}'[Quiet mode]' \
+            '(-v --verbose)'{-v,--verbose}'[Verbose mode]' \
+            '1:pattern:_files -g "*.{txt,json,pattern}"'
+          ;;
+        render)
+          _arguments \
+            '(-s --samples)'{-s,--samples}'[Samples directory]:directory:_files -/' \
+            '(-o --output)'{-o,--output}'[Output WAV file]:file:_files -g "*.wav"' \
+            '--sample-rate[Sample rate]:rate:(44100 48000 96000)' \
+            '--bit-depth[Bit depth]:bits:(16 24 32)' \
+            '--format[Output format]:format:(wav mp3 flac)' \
+            '(-q --quiet)'{-q,--quiet}'[Quiet mode]' \
+            '(-v --verbose)'{-v,--verbose}'[Verbose mode]' \
+            '1:pattern:_files -g "*.json"'
+          ;;
+        import)
+          _arguments \
+            '(-f --format)'{-f,--format}'[Output format]:format:(json text)' \
+            '(-o --output)'{-o,--output}'[Output file]:file:_files -g "*.{json,txt}"' \
+            '(-q --quiet)'{-q,--quiet}'[Quiet mode]' \
+            '(-v --verbose)'{-v,--verbose}'[Verbose mode]' \
+            '1:midi file:_files -g "*.{mid,midi}"'
+          ;;
+        export)
+          _arguments \
+            '(-f --format)'{-f,--format}'[Output format]:format:(midi text)' \
+            '(-o --output)'{-o,--output}'[Output file]:file:_files' \
+            '(-q --quiet)'{-q,--quiet}'[Quiet mode]' \
+            '(-v --verbose)'{-v,--verbose}'[Verbose mode]' \
+            '1:pattern:_files -g "*.json"'
+          ;;
+      esac
+      ;;
+  esac
+}
+
+_beat-gen "$@"
