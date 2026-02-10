@@ -43,44 +43,44 @@ generate_beat() {
   case $GENRE in
     house)
       $CLI sample \
-        "deep house kick drum" \
-        "tight house snare" \
-        "crisp closed hi-hat" \
-        "bright open hi-hat" \
-        "house clap" \
+        "kick deep house" \
+        "snare tight house" \
+        "hihat crisp" \
+        "hihat-open bright" \
+        "clap house" \
         --output "$SAMPLE_DIR" \
         --duration 2 \
         > /dev/null 2>&1
       ;;
     techno)
       $CLI sample \
-        "hard techno kick" \
-        "sharp industrial snare" \
-        "metallic closed hi-hat" \
-        "percussive rim shot" \
-        "minimal clap" \
+        "kick hard techno" \
+        "snare sharp industrial" \
+        "hihat metallic" \
+        "rimshot percussive" \
+        "clap minimal" \
         --output "$SAMPLE_DIR" \
         --duration 2 \
         > /dev/null 2>&1
       ;;
     dnb)
       $CLI sample \
-        "punchy drum and bass kick" \
-        "tight jungle snare" \
-        "fast closed hi-hat" \
-        "amen break style snare" \
-        "jungle crash cymbal" \
+        "kick punchy dnb" \
+        "snare tight jungle" \
+        "hihat fast" \
+        "snare amen" \
+        "crash jungle" \
         --output "$SAMPLE_DIR" \
         --duration 2 \
         > /dev/null 2>&1
       ;;
     trip-hop)
       $CLI sample \
-        "dusty trip hop kick" \
-        "warm vinyl snare" \
-        "lo-fi closed hi-hat" \
-        "atmospheric open hi-hat" \
-        "vintage clap" \
+        "kick dusty trip-hop" \
+        "snare warm vinyl" \
+        "hihat lofi" \
+        "hihat-open atmospheric" \
+        "clap vintage" \
         --output "$SAMPLE_DIR" \
         --duration 2 \
         > /dev/null 2>&1

@@ -3,6 +3,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { parseJSONPattern } from '../../core/pattern-parser.js';
 import { renderToWAV, checkFFmpeg } from '../../services/audio-renderer.js';
+import { loadMixConfig, listPresets } from '../../services/mix-processor.js';
 
 /**
  * Render command - create WAV from pattern and samples
@@ -37,6 +38,11 @@ export async function renderCommand(patternFile, options) {
     process.exit(1);
   }
 
+  // Override tempo if --bpm provided
+  if (options.bpm) {
+    pattern.tempo = parseInt(options.bpm, 10);
+  }
+
   // Verify samples directory
   const samplesDir = options.samples || './samples';
   try {
@@ -46,6 +52,22 @@ export async function renderCommand(patternFile, options) {
     console.log(chalk.yellow('\nGenerate samples first:'));
     console.log(chalk.gray('  beat-gen sample --kit 808'));
     process.exit(1);
+  }
+
+  // Load mix config from --preset or --mix
+  let mixConfig = null;
+  const mixSource = options.preset || options.mix;
+  if (mixSource) {
+    try {
+      mixConfig = await loadMixConfig(mixSource);
+      const presetNames = listPresets();
+      const label = presetNames.includes(mixSource) ? `preset: ${mixSource}` : `file: ${mixSource}`;
+      console.log(chalk.cyan(`Mix: ${label}`));
+    } catch (err) {
+      console.error(chalk.red(`Error loading mix config: ${err.message}`));
+      console.log(chalk.yellow(`Available presets: ${listPresets().join(', ')}`));
+      process.exit(1);
+    }
   }
 
   // Print pattern info
@@ -61,6 +83,7 @@ export async function renderCommand(patternFile, options) {
       format: options.format || 'wav',
       sampleRate: options.sampleRate || 44100,
       bitDepth: options.bitDepth || 16,
+      mixConfig,
     });
 
     console.log(chalk.green('✓ Audio rendering complete'));

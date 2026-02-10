@@ -1,6 +1,8 @@
 import ffmpeg from 'fluent-ffmpeg';
 import fs from 'fs/promises';
 import path from 'path';
+import { getDrumFileName, GM_DRUM_MAP } from '../utils/gm-drum-map.js';
+import { buildBusFilter } from './mix-processor.js';
 
 /**
  * Render pattern to WAV file using generated samples
@@ -10,6 +12,7 @@ export async function renderToWAV(pattern, samplesDir, outputPath, options = {})
     format = 'wav',
     sampleRate = 44100,
     bitDepth = 16,
+    mixConfig = null,
   } = options;
 
   // Calculate pattern duration
@@ -32,7 +35,9 @@ export async function renderToWAV(pattern, samplesDir, outputPath, options = {})
   }
 
   // Build ffmpeg filter complex for mixing
-  const filterComplex = buildMixingFilter(events, duration);
+  const filterComplex = mixConfig
+    ? buildBusFilter(events, duration, mixConfig)
+    : buildMixingFilter(events, duration);
 
   return new Promise((resolve, reject) => {
     let command = ffmpeg();
@@ -111,20 +116,37 @@ async function buildEventTimeline(pattern, samplesDir, resolution, tempo) {
 }
 
 /**
- * Find sample file for drum name
+ * Find sample file for drum name with enhanced search
+ * Priority: note-prefixed > standard name > descriptive variants
  */
 async function findSampleFile(samplesDir, drumName) {
   const extensions = ['.mp3', '.wav', '.ogg', '.m4a'];
-  const variations = [
-    drumName,
-    drumName.replace('-', '_'),
-    drumName.replace('_', '-'),
-    drumName.toLowerCase(),
-  ];
 
-  for (const name of variations) {
+  // Get MIDI note and standard filename
+  const midiNote = GM_DRUM_MAP[drumName.toLowerCase()];
+  const standardName = getDrumFileName(drumName);
+
+  // Build search priority list
+  const searchPatterns = [];
+
+  if (midiNote) {
+    // Highest priority: note-prefixed files (e.g., 36-kick.mp3, 36-kick-808.mp3)
+    searchPatterns.push(`${midiNote}-${standardName}`);
+    searchPatterns.push(`${midiNote}-${drumName.toLowerCase()}`);
+  }
+
+  // Standard names without note prefix
+  searchPatterns.push(standardName);
+  searchPatterns.push(drumName.toLowerCase());
+
+  // Variations (underscore, case)
+  searchPatterns.push(drumName.replace('-', '_').toLowerCase());
+  searchPatterns.push(drumName.replace('_', '-').toLowerCase());
+
+  // Try exact matches first
+  for (const pattern of searchPatterns) {
     for (const ext of extensions) {
-      const filePath = path.join(samplesDir, name + ext);
+      const filePath = path.join(samplesDir, pattern + ext);
       try {
         await fs.access(filePath);
         return filePath;
@@ -132,6 +154,29 @@ async function findSampleFile(samplesDir, drumName) {
         // Try next
       }
     }
+  }
+
+  // Try glob patterns for variants with descriptors (e.g., 36-kick-*.mp3)
+  try {
+    const files = await fs.readdir(samplesDir);
+
+    if (midiNote) {
+      // Try note-prefixed with any descriptor: 36-kick-*.mp3
+      const notePattern = new RegExp(`^${midiNote}-${standardName}(-.*)?\\.(mp3|wav|ogg|m4a)$`, 'i');
+      const match = files.find(f => notePattern.test(f));
+      if (match) {
+        return path.join(samplesDir, match);
+      }
+    }
+
+    // Try standard name with descriptor: kick-*.mp3
+    const standardPattern = new RegExp(`^${standardName}(-.*)?\\.(mp3|wav|ogg|m4a)$`, 'i');
+    const match = files.find(f => standardPattern.test(f));
+    if (match) {
+      return path.join(samplesDir, match);
+    }
+  } catch {
+    // Directory read failed
   }
 
   return null;

@@ -353,6 +353,61 @@ export function generateOstinato(polyrhythm = '3:4') {
 }
 
 // ============================================================================
+// Reggae (80-100 BPM)
+// ============================================================================
+
+export function generateReggae(style = 'one-drop') {
+  const resolution = 16;
+
+  let kick, snare, closedHat, openHat;
+
+  if (style === 'one-drop') {
+    // Classic one drop: kick + snare on beat 3 only
+    kick = [{ step: 8, velocity: 127 }];
+    snare = [{ step: 8, velocity: 115 }];
+  } else if (style === 'rockers') {
+    // Rockers: kick on every beat, snare on beat 3
+    kick = fourOnFloor(resolution);
+    snare = [{ step: 8, velocity: 115 }];
+  } else {
+    // Steppers: kick on every beat, snare on 2 & 4
+    kick = fourOnFloor(resolution);
+    snare = backbeat(resolution);
+  }
+
+  // Offbeat hi-hats -- the reggae skank
+  closedHat = offbeat(resolution, 80);
+
+  // Open hat on the "and" of beat 4 for lift
+  openHat = [{ step: 14, velocity: 85 }];
+
+  // Rim click on beats 2 and 4 (cross-stick)
+  const rim = [
+    { step: 4, velocity: 90 },
+    { step: 12, velocity: 85 }
+  ];
+
+  const tracks = [
+    { name: 'kick', midiNote: 36, pattern: kick },
+    { name: 'snare', midiNote: 38, pattern: snare },
+    { name: 'closed-hat', midiNote: 42, pattern: closedHat },
+    { name: 'open-hat', midiNote: 46, pattern: openHat },
+    { name: 'rim', midiNote: 37, pattern: rim }
+  ];
+
+  return createPattern({
+    name: `Reggae ${style}`,
+    genre: 'reggae',
+    style,
+    suggestedBPM: 90,
+    bpmRange: [80, 100],
+    intensity: 'low',
+    resolution,
+    tags: ['reggae', 'dub', style]
+  }, tracks);
+}
+
+// ============================================================================
 // Export genre generators
 // ============================================================================
 
@@ -364,7 +419,8 @@ export const GENRE_GENERATORS = {
   'uk-garage': generateUKGarage,
   idm: generateIDM,
   'trip-hop': generateTripHop,
-  ostinato: generateOstinato
+  ostinato: generateOstinato,
+  reggae: generateReggae
 };
 
 export const GENRE_VARIATIONS = {
@@ -375,5 +431,6 @@ export const GENRE_VARIATIONS = {
   'uk-garage': ['main'],
   idm: ['main'],
   'trip-hop': ['main'],
-  ostinato: ['3:4', '5:4', '7:8']
+  ostinato: ['3:4', '5:4', '7:8'],
+  reggae: ['one-drop', 'rockers', 'steppers']
 };

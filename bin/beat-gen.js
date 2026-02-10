@@ -8,6 +8,7 @@ import { exportCommand } from '../src/cli/commands/export.js';
 import { importCommand } from '../src/cli/commands/import.js';
 import { renderCommand } from '../src/cli/commands/render.js';
 import { generateCommand } from '../src/cli/commands/generate.js';
+import { hybridCommand } from '../src/cli/commands/hybrid.js';
 
 const program = new Command();
 
@@ -67,11 +68,14 @@ program
   .command('render')
   .description('Render pattern to WAV using generated samples (requires ffmpeg)')
   .argument('<pattern>', 'Pattern file (JSON)')
+  .option('-b, --bpm <tempo>', 'Override tempo (BPM)')
   .option('-s, --samples <dir>', 'Samples directory', './samples')
   .option('-o, --output <file>', 'Output WAV file', 'output.wav')
   .option('--sample-rate <rate>', 'Sample rate in Hz', '44100')
   .option('--bit-depth <bits>', 'Bit depth', '16')
   .option('--format <format>', 'Output format', 'wav')
+  .option('-m, --mix <file>', 'Mix config JSON file for per-track gain/EQ/effects')
+  .option('--preset <name>', 'Mix preset (clean, compressed, dub)')
   .action(renderCommand);
 
 // Generate command
@@ -86,6 +90,18 @@ program
   .option('-l, --list', 'List available genres')
   .option('-v, --variability', 'Add ghost notes and humanization')
   .action(generateCommand);
+
+// Hybrid loop generation command
+program
+  .command('hybrid')
+  .description('Generate hybrid loops combining multiple genres')
+  .argument('<genres...>', 'Genres to combine (e.g., idm uk-garage house)')
+  .option('-v, --variants <number>', 'Number of variants to generate', '4')
+  .option('-t, --tempo <bpm>', 'Override tempo (BPM)')
+  .option('-o, --output <dir>', 'Output directory', './data/output/hybrid')
+  .option('-s, --samples-dir <dir>', 'Samples base directory', './data/audio-samples')
+  .option('-p, --patterns <dir>', 'Patterns directory', './data/generated-patterns')
+  .action(hybridCommand);
 
 // Help examples
 program.addHelpText('after', `
@@ -118,10 +134,21 @@ ${chalk.cyan('Examples:')}
   ${chalk.gray('# Render pattern to WAV with samples')}
   $ beat-gen render pattern.json --samples ./samples/808/ --output beat.wav
 
+  ${chalk.gray('# Render with mix preset (tame hats, add compression)')}
+  $ beat-gen render pattern.json --samples ./samples/808/ --preset clean
+  $ beat-gen render pattern.json --samples ./samples/808/ --preset dub
+
+  ${chalk.gray('# Render with custom mix config')}
+  $ beat-gen render pattern.json --samples ./samples/808/ --mix my-mix.json
+
   ${chalk.gray('# Generate pattern library')}
   $ beat-gen generate house --count 5
   $ beat-gen generate --all --count 10
   $ beat-gen generate --list
+
+  ${chalk.gray('# Generate hybrid loops')}
+  $ beat-gen hybrid idm uk-garage house --variants 4
+  $ beat-gen hybrid techno dnb --tempo 150 --variants 3
 
 ${chalk.yellow('Environment Variables:')}
   ELEVENLABS_API_KEY    Your 11Labs API key for sample generation

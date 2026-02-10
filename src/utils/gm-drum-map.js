@@ -16,14 +16,17 @@ export const GM_DRUM_MAP = {
   'sd': 38,
   'snare2': 40,       // Electric Snare
   'rimshot': 37,      // Side Stick
+  'rim': 37,          // Alias used by generators
   'clap': 39,         // Hand Clap
 
   // Hi-hats
   'hihat': 42,        // Closed Hi-Hat
   'hh': 42,
   'ch': 42,
+  'closed-hat': 42,   // Alias used by generators
   'hihat-open': 46,   // Open Hi-Hat
   'oh': 46,
+  'open-hat': 46,     // Alias used by generators
   'hihat-pedal': 44,  // Pedal Hi-Hat
   'ph': 44,
 
@@ -109,4 +112,100 @@ export function getDrumName(note) {
  */
 export function isValidDrum(name) {
   return GM_DRUM_MAP.hasOwnProperty(name.toLowerCase());
+}
+
+/**
+ * Standard sample filenames for each GM drum note
+ * Maps MIDI note numbers to standardized filenames
+ */
+export const DRUM_SAMPLE_NAMES = {
+  // Bass drums
+  35: 'kick',
+  36: 'kick',
+
+  // Snares
+  37: 'rimshot',
+  38: 'snare',
+  39: 'clap',
+  40: 'snare',
+
+  // Hi-hats
+  42: 'hihat',
+  44: 'hihat-pedal',
+  46: 'hihat-open',
+
+  // Toms
+  41: 'tom-low',
+  43: 'tom-low',
+  45: 'tom-mid',
+  47: 'tom-mid',
+  48: 'tom-high',
+  50: 'tom-high',
+
+  // Cymbals
+  49: 'crash',
+  51: 'ride',
+  52: 'china',
+  55: 'splash',
+  57: 'crash',
+  59: 'ride',
+
+  // Percussion
+  54: 'tambourine',
+  56: 'cowbell',
+  58: 'vibraslap',
+  60: 'bongo-high',
+  61: 'bongo-low',
+  62: 'conga-high',
+  64: 'conga-low',
+  65: 'timbale-high',
+  66: 'timbale-low',
+  67: 'agogo-high',
+  68: 'agogo-low',
+  69: 'cabasa',
+  70: 'maracas',
+  71: 'whistle-short',
+  72: 'whistle-long',
+  73: 'guiro-short',
+  74: 'guiro-long',
+  75: 'claves',
+  76: 'woodblock-high',
+  77: 'woodblock-low',
+  80: 'triangle-mute',
+  81: 'triangle-open',
+  82: 'shaker',
+};
+
+/**
+ * Get standard filename for drum name
+ * @param {string} drumName - GM drum name (e.g., 'kick', 'snare')
+ * @returns {string} Standard filename without extension
+ */
+export function getDrumFileName(drumName) {
+  const note = GM_DRUM_MAP[drumName.toLowerCase()];
+  if (!note) {
+    return drumName.toLowerCase();
+  }
+  return DRUM_SAMPLE_NAMES[note] || drumName.toLowerCase();
+}
+
+/**
+ * Format sample name with MIDI note prefix and optional descriptor
+ * @param {string} drumName - GM drum name
+ * @param {string|null} descriptor - Optional descriptor (e.g., '808', 'deep')
+ * @returns {string} Formatted filename with MIDI note prefix, without extension
+ */
+export function formatSampleName(drumName, descriptor = null) {
+  const note = GM_DRUM_MAP[drumName.toLowerCase()];
+  const baseName = getDrumFileName(drumName);
+
+  if (!note) {
+    // Fallback if no MIDI note found
+    return descriptor ? `${baseName}-${descriptor}` : baseName;
+  }
+
+  if (descriptor) {
+    return `${note}-${baseName}-${descriptor}`;
+  }
+  return `${note}-${baseName}`;
 }
