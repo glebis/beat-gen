@@ -1,385 +1,210 @@
-# Beat-Gen
+# Beat-Gen v2
 
-CLI drum machine with AI sample generation and MIDI export. Generate drum samples using 11Labs AI, compose beats with simple text notation, and export to MIDI for use in any DAW or hardware sampler (like Yamaha).
+Full track generator: drums + bass + melody + pads with section-based arrangements, multi-track MIDI export, WAV rendering, and PNG visualization.
+
+Designed for **AI agent** workflows: every feature is CLI-controllable, outputs JSON, supports `--seed` for reproducibility, and `--json` for machine-readable output.
 
 ## Features
 
-- 🎵 **AI Sample Generation** - Generate drum samples using 11Labs text-to-sound API
-- 🎹 **MIDI Export** - Full General MIDI drum mapping (Channel 10) for universal DAW compatibility
-- 📝 **Simple Text Notation** - Write beats in intuitive X...X... format
-- 🎼 **JSON Patterns** - Structured pattern format with velocity and timing control
-- 🔄 **MIDI Import** - Load existing MIDI files and convert to editable patterns
-- 🎶 **Swing/Shuffle** - Apply groove to patterns
-- 🥁 **Preset Drum Kits** - Generate 808, acoustic, or electronic kits
-
-## Installation
-
-```bash
-npm install -g beat-gen
-
-# Or run locally
-cd beat-gen
-npm install
-npm link
-```
+- **9 genres**: house, techno, dnb, breakbeat, uk-garage, idm, trip-hop, ostinato, reggae
+- **Full tracks**: drums + bass + melody + pads with genre-specific patterns
+- **Arrangement engine**: section-based structures (intro, build, drop, breakdown, outro)
+- **Music theory**: scales, chord progressions, key-aware generation
+- **Multi-track MIDI**: separate channels per instrument with GM program changes
+- **PNG visualization**: DAW-like arrangement timeline + pattern grid
+- **WAV rendering**: sample-based audio with FFmpeg
+- **AI samples**: 11Labs text-to-sound integration
+- **Agent-first**: `--json`, `--seed`, `--quiet` flags, `list` discovery command
 
 ## Quick Start
 
-### 1. Generate Samples
-
 ```bash
-# Set your 11Labs API key
-export ELEVENLABS_API_KEY=your_api_key_here
+npm install
+npm link
 
-# Generate single sample
-beat-gen sample "808 kick drum"
+# Generate a full house track (JSON + MIDI + PNG)
+beat-gen track house --key C --bpm 128 --seed 42
 
-# Generate multiple samples
-beat-gen sample "tight snare" "closed hi-hat" "open hi-hat"
+# JSON output for agent piping
+beat-gen track house --key Cm --json --seed 42
 
-# Generate preset drum kit
-beat-gen sample --kit 808
-beat-gen sample --kit acoustic
-beat-gen sample --kit electronic
+# Discover options
+beat-gen list genres
+beat-gen list scales
+beat-gen list instruments
+beat-gen list sections house
 ```
 
-### 2. Compose Beats
+## Commands
+
+### `track` - Full Track Generation (NEW)
 
 ```bash
-# Create beat from text pattern file
-beat-gen compose data/example-patterns/example-basic.txt --bpm 120 --output my-beat.mid
+beat-gen track <genre> [options]
 
-# Create beat with inline pattern
-beat-gen compose --pattern "kick: X...X...X...X...
-snare: ....X.......X...
-hihat: ..X...X...X...X." --bpm 140
+Options:
+  -k, --key <key>           Musical key (default: C)
+  --scale <scale>           Scale (default: minor)
+  -b, --bpm <tempo>         BPM (default: genre-appropriate)
+  -r, --resolution <steps>  Steps per bar (default: 16)
+  --tracks <list>           Comma-separated track list (e.g. "drums,bass,lead")
+  --sections <list>         Override sections (e.g. "intro,drop,outro")
+  --progression <list>      Chord degrees (e.g. "1,4,5,1")
+  --seed <number>           Deterministic random seed
+  --json                    JSON to stdout (for agent piping)
+  -q, --quiet               Suppress progress output
+  -o, --output <dir>        Output directory (default: ./output)
 
-# Apply swing
-beat-gen compose pattern.txt --swing 0.5 --bpm 95
-
-# Use JSON pattern for advanced control
-beat-gen compose patterns/example-advanced.json --output beat.mid
+Outputs: <genre>.json + <genre>.mid + <genre>.png
 ```
 
-### 3. Import/Export
+### `bass` - Bass Pattern Generator
 
 ```bash
-# Import MIDI file to JSON
-beat-gen import your-beat.mid --format json
-
-# Import MIDI to text notation
-beat-gen import your-beat.mid --format text
-
-# Export JSON pattern to MIDI
-beat-gen export pattern.json --format midi --output beat.mid
-
-# Export JSON to text notation
-beat-gen export pattern.json --format text
+beat-gen bass --genre house --key C --scale minor --json --seed 42
+beat-gen bass --list-modes
 ```
 
-### 4. Render to WAV (Requires FFmpeg)
+### `melody` - Melody/Pad/Arp Generator
 
 ```bash
-# Render pattern with generated samples to final WAV file
+beat-gen melody --genre house --key C --instrument lead --json --seed 42
+beat-gen melody --instrument pad --genre trip-hop --json
+beat-gen melody --list-instruments
+```
+
+### `visualize` - PNG Visualization
+
+```bash
+beat-gen visualize pattern.json -o structure.png
+beat-gen visualize track.json --width 1200 --height 800
+```
+
+### `list` - Discovery (Agent-Friendly)
+
+```bash
+beat-gen list genres          # ["house","techno","dnb",...]
+beat-gen list scales          # ["minor","dorian","pentatonic",...]
+beat-gen list instruments     # [{name,channel,program},...]
+beat-gen list progressions    # {house:[[1,4],...], ...}
+beat-gen list sections house  # [{name,bars,energy},...]
+beat-gen list presets         # ["clean","compressed","dub"]
+beat-gen list variations      # {house:["main"], dnb:["amen","two-step"],...}
+```
+
+### `theory` - Music Theory Utilities
+
+```bash
+beat-gen theory --list-scales
+beat-gen theory --list-keys
+beat-gen theory --list-progressions house
+beat-gen theory --scale "C minor" --octave 2-4
+```
+
+### `compose` - Pattern to MIDI
+
+```bash
+beat-gen compose pattern.txt --bpm 120 --output beat.mid
+beat-gen compose --pattern "kick: X...X..." --bpm 120
+```
+
+### `render` - WAV Audio Rendering
+
+```bash
 beat-gen render pattern.json --samples ./samples/808/ --output beat.wav
-
-# Custom sample rate and format
-beat-gen render pattern.json --samples ./samples/ --sample-rate 48000 --output beat.wav
+beat-gen render pattern.json --preset dub --samples ./samples/808/
 ```
 
-**Requirements:**
-- FFmpeg must be installed (`brew install ffmpeg` on macOS)
-- Samples must match drum names in pattern (kick.wav, snare.wav, etc.)
-- Supports MP3, WAV, OGG input samples
+### `generate` - Pattern Library
 
-## Pattern Notation
-
-### Text Format
-
-Simple, human-readable notation for quick beat creation:
-
-```
-# X = hit (velocity 100)
-# x = soft hit (velocity 60)
-# . = rest
-# 1-9 = custom velocity (1=10, 9=90)
-
-kick:  X...X...X...X...
-snare: ....X.......X...
-hihat: x.x.x.x.x.x.x.x.
-clap:  ....X.......X...
+```bash
+beat-gen generate house --count 5
+beat-gen generate --all --count 10
+beat-gen generate --list
 ```
 
-**Supported drum names:**
-- Bass: `kick`, `bass`, `bd`
-- Snares: `snare`, `sn`, `sd`, `rimshot`, `clap`
-- Hi-hats: `hihat`, `hh`, `ch`, `hihat-open`, `oh`, `hihat-pedal`, `ph`
-- Toms: `tom1`, `tom2`, `tom3`, `tom-high`, `tom-mid`, `tom-low`
-- Cymbals: `crash`, `crash2`, `ride`, `ride2`, `china`, `splash`
-- Percussion: `cowbell`, `tambourine`, `shaker`, `conga-high`, `conga-low`
+### `sample` - AI Sample Generation (11Labs)
 
-Full GM drum map in `src/utils/gm-drum-map.js`
+```bash
+beat-gen sample "808 kick drum"
+beat-gen sample --kit 808
+```
 
-### JSON Format
+### `import` / `export` - Format Conversion
 
-Structured format with full control over velocity and timing:
+```bash
+beat-gen import beat.mid --format json
+beat-gen export pattern.json --format midi
+```
+
+## Agent Workflow Example
+
+```bash
+# 1. Discover options
+GENRES=$(beat-gen list genres)
+SCALES=$(beat-gen list scales)
+
+# 2. Generate deterministic track
+beat-gen track house --key C --scale minor --bpm 128 --seed 42 --json > track.json
+
+# 3. Generate individual parts
+beat-gen bass --genre house --key C --json --seed 42 > bass.json
+beat-gen melody --genre house --key C --instrument lead --json --seed 42 > melody.json
+
+# 4. Visualize
+beat-gen visualize track.json -o structure.png
+```
+
+## Pattern Schema v2.0
 
 ```json
 {
-  "version": "1.0",
-  "tempo": 120,
+  "version": "2.0",
+  "key": "Cm",
+  "scale": "minor",
+  "tempo": 128,
   "timeSignature": "4/4",
   "resolution": 16,
-  "swing": 0,
   "tracks": [
-    {
-      "name": "kick",
-      "midiNote": 36,
-      "pattern": [
-        { "step": 0, "velocity": 100 },
-        { "step": 4, "velocity": 100 }
-      ]
-    }
+    { "name": "kick", "midiNote": 36, "pattern": [{"step": 0, "velocity": 127}] },
+    { "name": "bass", "channel": 2, "instrument": 39,
+      "pattern": [{"step": 0, "velocity": 100, "pitch": 36, "duration": 4}] }
+  ],
+  "sections": [
+    { "name": "intro", "bars": 8, "activeTracks": ["drums"], "energy": 0.3 },
+    { "name": "drop", "bars": 16, "activeTracks": ["drums","bass","lead"], "energy": 1.0 }
   ]
 }
 ```
 
-## MIDI Compatibility
+Backward compatible: patterns without `sections` or pitched fields work as v1.
 
-Beat-Gen exports **Standard MIDI Format 1** files with:
-- **Channel 10** for drums (General MIDI standard)
-- **Standard GM drum mapping** (Kick=36, Snare=38, Hi-hat=42, etc.)
-- Compatible with all major DAWs:
-  - Ableton Live
-  - FL Studio
-  - Logic Pro
-  - Pro Tools
-  - Reaper
-  - Studio One
-  - Hardware samplers (Yamaha, Akai MPC, etc.)
+## Architecture
 
-## CLI Reference
-
-### Sample Command
-
-```bash
-beat-gen sample [prompts...] [options]
-
-Options:
-  -k, --kit <name>        Generate preset kit (808, acoustic, electronic)
-  -o, --output <dir>      Output directory (default: ./samples)
-  -d, --duration <sec>    Sample duration (default: 2)
-  -i, --influence <val>   Prompt influence 0-1 (default: 0.5)
-  --api-key <key>         11Labs API key
+```
+src/
+  cli/commands/     # 12 CLI commands
+  core/             # Pattern parser
+  generators/       # Pattern, bass, melody, arrangement engines
+  services/         # MIDI, audio, visualizer
+  utils/            # Music theory, GM maps, config
 ```
 
-### Compose Command
-
-```bash
-beat-gen compose [pattern] [options]
-
-Options:
-  -b, --bpm <tempo>           Tempo in BPM (default: 120)
-  -t, --time-signature <sig>  Time signature (default: 4/4)
-  -s, --swing <amount>        Swing amount 0-1 (default: 0)
-  -r, --resolution <steps>    Steps per pattern (default: 16)
-  -o, --output <file>         Output MIDI file (default: output.mid)
-  -p, --pattern <text>        Inline text pattern
-```
-
-### Export Command
-
-```bash
-beat-gen export <input> [options]
-
-Options:
-  -f, --format <format>  Output format (midi, text)
-  -o, --output <file>    Output file
-```
-
-### Import Command
-
-```bash
-beat-gen import <midiFile> [options]
-
-Options:
-  -f, --format <format>  Output format (json, text)
-  -o, --output <file>    Output file
-```
-
-### Render Command
-
-```bash
-beat-gen render <pattern> [options]
-
-Options:
-  -s, --samples <dir>      Samples directory (default: ./samples)
-  -o, --output <file>      Output WAV file (default: output.wav)
-  --sample-rate <rate>     Sample rate in Hz (default: 44100)
-  --bit-depth <bits>       Bit depth (default: 16)
-  --format <format>        Output format (default: wav)
-```
-
-**Requirements:** FFmpeg must be installed
-
-## Examples
-
-### Generate 808 Kit and Compose Beat
-
-```bash
-# 1. Generate samples
-beat-gen sample --kit 808 --output samples/808
-
-# 2. Create pattern file
-cat > my-beat.txt << 'EOF'
-kick:  X.....X.X.....X.
-snare: ....X.......X...
-hihat: X.X.X.X.X.X.X.X.
-EOF
-
-# 3. Compose MIDI
-beat-gen compose my-beat.txt --bpm 95 --swing 0.5 --output my-beat.mid
-
-# 4. Render to WAV
-beat-gen render my-beat.json --samples samples/808 --output my-beat.wav
-```
-
-### Complete Production Workflow
-
-```bash
-# 1. Generate AI samples
-export ELEVENLABS_API_KEY=your_key_here
-beat-gen sample --kit 808 --output samples/808
-
-# 2. Create pattern (text or JSON)
-cat > trip-hop.txt << 'EOF'
-kick:  X.....X...X.....
-snare: ......X.........X
-hihat: ..x.....x...x....
-EOF
-
-# 3. Compose to MIDI (for DAW)
-beat-gen compose trip-hop.txt --bpm 88 --swing 0.5 --output trip-hop.mid
-
-# 4. Also render to WAV (for preview/sharing)
-beat-gen compose trip-hop.txt --bpm 88 --output trip-hop.json
-beat-gen render trip-hop.json --samples samples/808 --output trip-hop.wav
-```
-
-### Advanced Pattern with Velocity Control
-
-```json
-{
-  "tempo": 140,
-  "resolution": 16,
-  "tracks": [
-    {
-      "name": "kick",
-      "midiNote": 36,
-      "pattern": [
-        { "step": 0, "velocity": 127 },
-        { "step": 6, "velocity": 80 },
-        { "step": 10, "velocity": 100 }
-      ]
-    }
-  ]
-}
-```
-
-### Convert Between Formats
-
-```bash
-# MIDI → JSON → Text → MIDI
-beat-gen import beat.mid --format json --output beat.json
-beat-gen export beat.json --format text --output beat.txt
-# Edit beat.txt...
-beat-gen compose beat.txt --output beat-edited.mid
-```
-
-## Hardware Sampler Workflow
-
-For Yamaha and other hardware samplers:
-
-1. **Generate samples** in WAV format
-2. **Compose MIDI pattern** with beat-gen
-3. **Load samples** into your sampler
-4. **Import MIDI file** to trigger samples
-
-```bash
-# Generate samples
-beat-gen sample --kit 808
-
-# Compose beat
-beat-gen compose pattern.txt --bpm 120 --output beat.mid
-
-# Transfer beat.mid to your sampler via USB/SD card
-```
-
-## 11Labs API
-
-Get your API key at: https://elevenlabs.io
-
-Free tier includes 10,000 characters/month (approx. 100-200 samples).
-
-```bash
-# Set API key (add to ~/.bashrc or ~/.zshrc)
-export ELEVENLABS_API_KEY=your_api_key_here
-
-# Or pass with each command
-beat-gen sample "kick" --api-key your_api_key_here
-```
-
-## Technical Details
-
-### Architecture
-
-- **Pattern Parser** - Text and JSON notation support
-- **GM Drum Mapper** - Standard MIDI note mapping
-- **Timing Engine** - Quantization and swing processing
-- **MIDI Engine** - SMF Format 1 export using @tonejs/midi
-- **11Labs Integration** - AI sample generation
-
-### File Formats
-
-- **Text patterns**: `.txt`, `.pattern`
-- **JSON patterns**: `.json`
-- **MIDI files**: `.mid`, `.midi`
-- **Samples**: `.mp3` (from 11Labs), `.wav` (for conversion)
-
-### Dependencies
+## Dependencies
 
 - `commander` - CLI framework
 - `@tonejs/midi` - MIDI file handling
+- `@napi-rs/canvas` - PNG rendering (Rust-based, no native build issues)
+- `fluent-ffmpeg` - Audio rendering
 - `chalk` - Terminal styling
-- `node-fetch` - HTTP requests
+
+## Testing
+
+```bash
+npm test         # 102 tests
+npm run test:all # + naming convention tests
+```
 
 ## License
 
 MIT
-
-## Contributing
-
-Issues and PRs welcome at: https://github.com/glebis/beat-gen
-
-## 📁 Project Structure
-
-```
-beat-gen/
-├── src/                    # Source code
-│   ├── cli/               # Command implementations
-│   ├── core/              # Pattern parser
-│   ├── generators/        # Pattern generation
-│   ├── services/          # MIDI & audio services
-│   └── utils/             # Utilities
-├── data/                   # Runtime data (mostly gitignored)
-│   ├── generated-patterns/ # Auto-generated patterns
-│   ├── example-patterns/   # Learning templates
-│   ├── demo-patterns/      # Hand-crafted demos
-│   └── output/            # CLI output
-├── docs/                   # Documentation
-├── scripts/               # Utility scripts
-└── bin/                   # CLI entry point
-```
-
-See [docs/STRUCTURE.md](docs/STRUCTURE.md) for detailed architecture.
-

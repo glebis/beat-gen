@@ -16,19 +16,29 @@ export async function renderToWAV(pattern, samplesDir, outputPath, options = {})
   } = options;
 
   // Calculate pattern duration
-  // Resolution = total steps in pattern (typically 16th notes)
-  // In 4/4: 16 steps = 1 bar, 64 steps = 4 bars
   const tempo = pattern.tempo || 120;
   const resolution = pattern.resolution || 16;
-  const stepsPerBeat = 4; // Assuming 16th note steps (4 per quarter note)
-  const totalBeats = resolution / stepsPerBeat;
+  const [numerator] = (pattern.timeSignature || '4/4').split('/').map(Number);
+  const stepsPerBeat = resolution / (numerator || 4);
   const secondsPerBeat = 60 / tempo;
-  const duration = totalBeats * secondsPerBeat;
+  const barDuration = numerator * secondsPerBeat;
+
+  // If sections exist, total duration = sum of all section bars
+  let duration;
+  if (pattern.sections && pattern.sections.length > 0) {
+    const totalBars = pattern.sections.reduce((sum, s) => sum + s.bars, 0);
+    duration = totalBars * barDuration;
+  } else {
+    const totalBeats = resolution / stepsPerBeat;
+    duration = totalBeats * secondsPerBeat;
+  }
 
   console.log(`Duration: ${duration.toFixed(2)}s at ${tempo} BPM`);
 
   // Build sample event timeline
-  const events = await buildEventTimeline(pattern, samplesDir, resolution, tempo);
+  const events = pattern.sections
+    ? await buildArrangementTimeline(pattern, samplesDir, resolution, tempo, stepsPerBeat, barDuration)
+    : await buildEventTimeline(pattern, samplesDir, resolution, tempo, stepsPerBeat);
 
   if (events.length === 0) {
     throw new Error('No events to render (missing samples?)');
@@ -51,7 +61,7 @@ export async function renderToWAV(pattern, samplesDir, outputPath, options = {})
       .complexFilter(filterComplex, '[out]')
       .audioChannels(2)
       .audioFrequency(sampleRate)
-      .audioBitrate(`${bitDepth}k`)
+      .audioCodec(bitDepth === 24 ? 'pcm_s24le' : 'pcm_s16le')
       .format(format)
       .on('start', (cmd) => {
         console.log('Rendering audio...');
@@ -79,12 +89,10 @@ export async function renderToWAV(pattern, samplesDir, outputPath, options = {})
 /**
  * Build timeline of sample events with timing
  */
-async function buildEventTimeline(pattern, samplesDir, resolution, tempo) {
+async function buildEventTimeline(pattern, samplesDir, resolution, tempo, stepsPerBeat) {
   const events = [];
-  // Each step = 1/16th note (standard sequencer resolution)
-  // secondsPerBeat = 60 / tempo
-  // 4 sixteenth notes per beat, so secondsPerStep = secondsPerBeat / 4
-  const secondsPerStep = (60 / tempo) / 4;
+  // secondsPerStep derived from stepsPerBeat (not hardcoded /4)
+  const secondsPerStep = (60 / tempo) / stepsPerBeat;
 
   for (const track of pattern.tracks) {
     // Find sample file for this track
@@ -113,6 +121,94 @@ async function buildEventTimeline(pattern, samplesDir, resolution, tempo) {
   events.sort((a, b) => a.time - b.time);
 
   return events;
+}
+
+/**
+ * Build timeline for an arrangement with sections
+ * Loops patterns across section bars, respecting activeTracks
+ */
+async function buildArrangementTimeline(pattern, samplesDir, resolution, tempo, stepsPerBeat, barDuration) {
+  const events = [];
+  const secondsPerStep = (60 / tempo) / stepsPerBeat;
+  let currentTime = 0;
+
+  // Cache sample paths
+  const sampleCache = {};
+  for (const track of pattern.tracks) {
+    if (!sampleCache[track.name]) {
+      sampleCache[track.name] = await findSampleFile(samplesDir, track.name);
+    }
+  }
+
+  for (const section of pattern.sections) {
+    const activeTracks = section.activeTracks || [];
+    const energyScale = section.energy || 1.0;
+
+    for (let bar = 0; bar < section.bars; bar++) {
+      const barOffset = currentTime + (bar * barDuration);
+
+      for (const track of pattern.tracks) {
+        // Check if track is active in this section
+        const isDrum = (track.channel ?? 9) === 9;
+        const isActive = activeTracks.some(t =>
+          (t === 'drums' && isDrum) || t === track.name
+        );
+        if (!isActive) continue;
+
+        const samplePath = sampleCache[track.name];
+        if (!samplePath) continue;
+
+        for (const note of track.pattern) {
+          const time = barOffset + (note.step * secondsPerStep);
+          const velocity = ((note.velocity || 100) / 127) * energyScale;
+
+          events.push({
+            time,
+            samplePath,
+            velocity: Math.min(1, velocity),
+            trackName: track.name,
+          });
+        }
+      }
+    }
+
+    currentTime += section.bars * barDuration;
+  }
+
+  events.sort((a, b) => a.time - b.time);
+  return events;
+}
+
+/**
+ * Render individual stems (one WAV per track)
+ */
+export async function renderStems(pattern, samplesDir, outputDir, options = {}) {
+  const { format = 'wav', sampleRate = 44100, bitDepth = 16 } = options;
+  const stems = [];
+
+  for (const track of pattern.tracks) {
+    // Create a pattern with only this track
+    const singleTrackPattern = {
+      ...pattern,
+      tracks: [track],
+      // If sections exist, make all of them active for this track
+      sections: pattern.sections ? pattern.sections.map(s => ({
+        ...s,
+        activeTracks: [track.name, (track.channel ?? 9) === 9 ? 'drums' : track.name],
+      })) : undefined,
+    };
+
+    const stemPath = path.join(outputDir, `track-${track.name}.${format}`);
+
+    try {
+      await renderToWAV(singleTrackPattern, samplesDir, stemPath, { format, sampleRate, bitDepth });
+      stems.push({ name: track.name, path: stemPath });
+    } catch (err) {
+      console.warn(`Warning: Could not render stem for ${track.name}: ${err.message}`);
+    }
+  }
+
+  return stems;
 }
 
 /**

@@ -73,10 +73,10 @@ export function densifyPattern(pattern, resolution, probability) {
 // ============================================================================
 
 export function createPattern(metadata, tracks) {
-  return {
-    version: "1.0",
+  const pattern = {
+    version: metadata.version || "1.0",
     metadata: {
-      generatedBy: "beat-gen v1.0",
+      generatedBy: "beat-gen v2.0",
       timestamp: new Date().toISOString(),
       variation: 'main',
       intensity: 'medium',
@@ -88,6 +88,14 @@ export function createPattern(metadata, tracks) {
     resolution: metadata.resolution || 16,
     tracks
   };
+
+  // v2 fields (only included when set)
+  if (metadata.key) pattern.key = metadata.key;
+  if (metadata.scale) pattern.scale = metadata.scale;
+  if (metadata.barsCount) pattern.barsCount = metadata.barsCount;
+  if (metadata.sections) pattern.sections = metadata.sections;
+
+  return pattern;
 }
 
 // ============================================================================

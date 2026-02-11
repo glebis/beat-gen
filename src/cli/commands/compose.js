@@ -17,7 +17,7 @@ export async function composeCommand(patternInput, options) {
   log.section('🎵 Beat-Gen Composer');
 
   let pattern;
-  let inputPath = patternInput || '-';
+  let inputPath = patternInput || options.pattern || '-';
 
   try {
     // Read pattern from file or stdin

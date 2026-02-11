@@ -3,13 +3,21 @@ const { Midi } = MidiModule;
 import fs from 'fs/promises';
 
 /**
- * Export pattern to MIDI file (Format 1, Channel 10)
+ * Export pattern to MIDI file
+ * Supports multi-track (drums + pitched instruments) and arrangement sections
  */
 export async function exportToMIDI(pattern, outputPath) {
   const midi = new Midi();
+  const tempo = pattern.tempo || 120;
+  const ppq = 480;
+  const resolution = pattern.resolution || 16;
+  const barsCount = pattern.barsCount || 1;
+  const ticksPerStep = (ppq * 4 * barsCount) / resolution;
+  const secondsPerTick = 60 / (tempo * ppq);
+  const barDurationSec = (resolution * ticksPerStep * secondsPerTick);
 
-  // Set tempo (BPM)
-  midi.header.setTempo(pattern.tempo || 120);
+  // Set tempo
+  midi.header.setTempo(tempo);
 
   // Parse time signature
   const [numerator, denominator] = (pattern.timeSignature || '4/4').split('/').map(Number);
@@ -18,29 +26,73 @@ export async function exportToMIDI(pattern, outputPath) {
     timeSignature: [numerator, denominator],
   });
 
-  // Calculate tick resolution
-  // 16th notes by default, with 480 PPQ (pulses per quarter note)
-  const ppq = 480;
-  const resolution = pattern.resolution || 16;
-  const ticksPerStep = (ppq * 4) / resolution; // 4 quarter notes per measure
+  // Group tracks by type: drum (channel 9) vs pitched
+  const drumTracks = [];
+  const pitchedTracks = [];
 
-  // Create drum track (Channel 10)
-  const track = midi.addTrack();
-  track.channel = 9; // Channel 10 (0-indexed = 9)
-  track.name = 'Drums';
+  for (const t of pattern.tracks) {
+    const ch = t.channel ?? 9;
+    if (ch === 9) {
+      drumTracks.push(t);
+    } else {
+      pitchedTracks.push(t);
+    }
+  }
 
-  // Add notes from all tracks
-  for (const drumTrack of pattern.tracks) {
-    for (const { step, velocity } of drumTrack.pattern) {
-      const ticks = step * ticksPerStep;
-      const duration = ticksPerStep * 0.1; // Short note duration
+  let totalNotes = 0;
 
-      track.addNote({
-        midi: drumTrack.midiNote,
-        time: ticks / ppq, // Convert to seconds
-        velocity: velocity / 127, // Normalize 0-1
-        duration: duration / ppq,
-      });
+  // -- Drum track --
+  if (drumTracks.length > 0) {
+    const midiTrack = midi.addTrack();
+    midiTrack.channel = 9;
+    midiTrack.name = 'Drums';
+
+    if (pattern.sections) {
+      totalNotes += addSectionedNotes(midiTrack, drumTracks, pattern.sections, 'drums',
+        resolution, ticksPerStep, secondsPerTick, barDurationSec, null);
+    } else {
+      for (const dt of drumTracks) {
+        for (const note of dt.pattern) {
+          const ticks = note.step * ticksPerStep;
+          midiTrack.addNote({
+            midi: dt.midiNote,
+            time: ticks * secondsPerTick,
+            velocity: (note.velocity || 100) / 127,
+            duration: ticksPerStep * 0.1 * secondsPerTick,
+          });
+          totalNotes++;
+        }
+      }
+    }
+  }
+
+  // -- Pitched tracks --
+  for (const pt of pitchedTracks) {
+    const midiTrack = midi.addTrack();
+    midiTrack.channel = pt.channel || 2;
+    midiTrack.name = pt.name || 'Instrument';
+
+    // Set instrument (GM program change)
+    if (pt.instrument !== undefined) {
+      midiTrack.instrument.number = pt.instrument;
+    }
+
+    if (pattern.sections) {
+      totalNotes += addSectionedNotes(midiTrack, [pt], pattern.sections, pt.name,
+        resolution, ticksPerStep, secondsPerTick, barDurationSec, pt);
+    } else {
+      for (const note of pt.pattern) {
+        const ticks = note.step * ticksPerStep;
+        const pitch = note.pitch ?? pt.midiNote;
+        const durSteps = note.duration || 1;
+        midiTrack.addNote({
+          midi: pitch,
+          time: ticks * secondsPerTick,
+          velocity: (note.velocity || 100) / 127,
+          duration: durSteps * ticksPerStep * secondsPerTick,
+        });
+        totalNotes++;
+      }
     }
   }
 
@@ -50,10 +102,54 @@ export async function exportToMIDI(pattern, outputPath) {
 
   return {
     path: outputPath,
-    tempo: pattern.tempo,
-    tracks: pattern.tracks.length,
-    notes: midi.tracks[0].notes.length,
+    tempo,
+    tracks: midi.tracks.length,
+    notes: totalNotes,
   };
+}
+
+/**
+ * Add notes for sectioned arrangement
+ * Loops the track pattern across each section's bars where the track is active
+ */
+function addSectionedNotes(midiTrack, tracks, sections, trackName, resolution, ticksPerStep, secondsPerTick, barDurationSec, pitchedTrack) {
+  let totalNotes = 0;
+  let currentTimeSec = 0;
+
+  for (const section of sections) {
+    const isActive = section.activeTracks.some(t => {
+      if (t === 'drums' && !pitchedTrack) return true;
+      return t === trackName;
+    });
+
+    if (isActive) {
+      const energyScale = section.energy || 1.0;
+      for (let bar = 0; bar < section.bars; bar++) {
+        const barOffsetSec = currentTimeSec + (bar * barDurationSec);
+
+        for (const track of tracks) {
+          for (const note of track.pattern) {
+            const noteTimeSec = barOffsetSec + (note.step * ticksPerStep * secondsPerTick);
+            const pitch = pitchedTrack ? (note.pitch ?? track.midiNote) : track.midiNote;
+            const durSteps = note.duration || (pitchedTrack ? 1 : 0.1);
+            const vel = Math.min(127, Math.round((note.velocity || 100) * energyScale));
+
+            midiTrack.addNote({
+              midi: pitch,
+              time: noteTimeSec,
+              velocity: vel / 127,
+              duration: durSteps * ticksPerStep * secondsPerTick,
+            });
+            totalNotes++;
+          }
+        }
+      }
+    }
+
+    currentTimeSec += section.bars * barDurationSec;
+  }
+
+  return totalNotes;
 }
 
 /**
@@ -97,12 +193,11 @@ export async function importFromMIDI(midiPath) {
 
   // Convert to pattern tracks
   const tracks = Object.entries(noteGroups).map(([midiNote, notes]) => {
-    // Quantize to 16th note grid
     const ppq = midi.header.ppq || 480;
     const ticksPerStep = (ppq * 4) / 16;
 
     const pattern = notes.map(({ time, velocity }) => {
-      const ticks = time * ppq;
+      const ticks = (time * tempo / 60) * ppq;
       const step = Math.round(ticks / ticksPerStep);
       return { step, velocity };
     });
