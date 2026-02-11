@@ -8,8 +8,14 @@ export const GM_INSTRUMENTS = {
   lead:    { channel: 3, program: 81, name: 'Lead 1 (square)', referencePitch: 60 },
   pad:     { channel: 4, program: 89, name: 'Pad 1 (new age)', referencePitch: 60 },
   arp:     { channel: 5, program: 82, name: 'Lead 2 (sawtooth)', referencePitch: 60 },
-  fx:      { channel: 6, program: 99, name: 'FX 4 (atmosphere)', referencePitch: 60 },
-  subBass: { channel: 7, program: 40, name: 'Synth Bass 2', referencePitch: 24 },
+  fx:         { channel: 6,  program: 99,  name: 'FX 4 (atmosphere)',    referencePitch: 60 },
+  subBass:    { channel: 7,  program: 40,  name: 'Synth Bass 2',       referencePitch: 24 },
+  vocalChop:  { channel: 8,  program: 55,  name: 'Synth Voice',        referencePitch: 60 },
+  texture:    { channel: 11, program: 101, name: 'FX 5 (brightness)',   referencePitch: 60 },
+  noise:      { channel: 12, program: 123, name: 'Seashore',           referencePitch: 60 },
+  scratch:    { channel: 13, program: 121, name: 'Guitar Fret Noise',  referencePitch: 60 },
+  atmosphere: { channel: 14, program: 90,  name: 'Pad 2 (warm)',       referencePitch: 60 },
+  stab:       { channel: 15, program: 81,  name: 'Lead 1 (square)',    referencePitch: 60 },
 };
 
 /**

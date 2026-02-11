@@ -12,6 +12,9 @@ import {
   randomRange,
   randomChoice,
   addGhostNotes,
+  euclideanToSteps,
+  createMeterGrid,
+  polyrhythmPattern,
 } from './pattern-generator.js';
 
 // ============================================================================
@@ -408,6 +411,248 @@ export function generateReggae(style = 'one-drop') {
 }
 
 // ============================================================================
+// UK Garage Broken Beat (displaced kicks, ghost hits)
+// ============================================================================
+
+export function generateUKGarage_broken() {
+  const resolution = 32;
+
+  // Displaced kicks: off beats 1 and 3
+  const kick = [
+    { step: 1, velocity: 120 },
+    { step: 7, velocity: 95 },
+    { step: 17, velocity: 115 },
+    { step: 23, velocity: 90 },
+  ];
+
+  // Ghost snares with extra hits
+  const snare = [
+    { step: 8, velocity: 115 },
+    { step: 11, velocity: 55 },
+    { step: 14, velocity: 50 },
+    { step: 24, velocity: 115 },
+    { step: 27, velocity: 60 },
+    { step: 30, velocity: 45 },
+  ];
+
+  // Shuffled hats (triplet feel)
+  const closedHat = [];
+  for (let i = 0; i < resolution; i += 3) {
+    closedHat.push({ step: i, velocity: randomRange(65, 85) });
+  }
+
+  const tracks = [
+    { name: 'kick', midiNote: 36, pattern: kick },
+    { name: 'snare', midiNote: 38, pattern: snare },
+    { name: 'closed-hat', midiNote: 42, pattern: closedHat },
+  ];
+
+  return createPattern({
+    name: 'UK Garage Broken',
+    genre: 'uk-garage',
+    style: 'broken',
+    suggestedBPM: 135,
+    bpmRange: [130, 140],
+    resolution,
+    tags: ['uk-garage', 'broken-beat', '2-step'],
+  }, tracks);
+}
+
+// ============================================================================
+// UK Garage Halftime
+// ============================================================================
+
+export function generateUKGarage_halftime() {
+  const resolution = 32;
+
+  const kick = [
+    { step: 0, velocity: 127 },
+    { step: 22, velocity: 90 },
+  ];
+
+  const snare = [
+    { step: 16, velocity: 120 },
+  ];
+
+  const closedHat = [];
+  for (let i = 0; i < resolution; i += 4) {
+    closedHat.push({ step: i, velocity: randomRange(60, 80) });
+  }
+
+  const tracks = [
+    { name: 'kick', midiNote: 36, pattern: kick },
+    { name: 'snare', midiNote: 38, pattern: snare },
+    { name: 'closed-hat', midiNote: 42, pattern: closedHat },
+  ];
+
+  return createPattern({
+    name: 'UK Garage Halftime',
+    genre: 'uk-garage',
+    style: 'halftime',
+    suggestedBPM: 135,
+    bpmRange: [130, 140],
+    resolution,
+    tags: ['uk-garage', 'halftime', 'garage'],
+  }, tracks);
+}
+
+// ============================================================================
+// IDM 5/4 with Euclidean rhythms
+// ============================================================================
+
+export function generateIDM_5over4() {
+  const grid = createMeterGrid('5/4', 4);
+  const resolution = grid.totalSteps; // 20
+
+  // Euclidean kick: E(3,20) -- 3 kicks across 20 steps
+  const kick = euclideanToSteps(3, resolution, 120);
+
+  // Euclidean snare: E(5,20) offset
+  const snare = euclideanToSteps(5, resolution, 105, 2);
+
+  // Dense glitchy hats
+  const closedHat = euclideanToSteps(11, resolution, 70);
+
+  const tracks = [
+    { name: 'kick', midiNote: 36, pattern: kick },
+    { name: 'snare', midiNote: 38, pattern: snare },
+    { name: 'closed-hat', midiNote: 42, pattern: closedHat },
+  ];
+
+  return createPattern({
+    name: 'IDM 5/4',
+    genre: 'idm',
+    style: '5/4',
+    suggestedBPM: 140,
+    bpmRange: [100, 180],
+    timeSignature: '5/4',
+    intensity: 'high',
+    complexity: 'complex',
+    resolution,
+    tags: ['idm', '5/4', 'euclidean', 'experimental'],
+  }, tracks);
+}
+
+// ============================================================================
+// IDM 7/8 with asymmetric groupings
+// ============================================================================
+
+export function generateIDM_7over8() {
+  const grid = createMeterGrid('7/8', 4);
+  const resolution = grid.totalSteps; // 14
+
+  // Asymmetric grouping: 3+2+2 or 2+2+3
+  const kick = [
+    { step: 0, velocity: 127 },
+    { step: 6, velocity: 110 },
+    { step: 10, velocity: 115 },
+  ];
+
+  const snare = [
+    { step: 3, velocity: 100 },
+    { step: 8, velocity: 105 },
+    { step: 12, velocity: 95 },
+  ];
+
+  const closedHat = euclideanToSteps(7, resolution, 75);
+
+  const tracks = [
+    { name: 'kick', midiNote: 36, pattern: kick },
+    { name: 'snare', midiNote: 38, pattern: snare },
+    { name: 'closed-hat', midiNote: 42, pattern: closedHat },
+  ];
+
+  return createPattern({
+    name: 'IDM 7/8',
+    genre: 'idm',
+    style: '7/8',
+    suggestedBPM: 140,
+    bpmRange: [100, 180],
+    timeSignature: '7/8',
+    intensity: 'high',
+    complexity: 'complex',
+    resolution,
+    tags: ['idm', '7/8', 'odd-meter', 'experimental'],
+  }, tracks);
+}
+
+// ============================================================================
+// IDM Polyrhythm (5:3)
+// ============================================================================
+
+export function generateIDM_polyrhythm() {
+  const resolution = 32;
+
+  // Polyrhythmic kick/snare at 5:3
+  const { layer1, layer2 } = polyrhythmPattern(resolution, 5, 3);
+  const kick = layer1.map(n => ({ ...n, velocity: Math.min(n.velocity + 15, 127) }));
+  const snare = layer2;
+
+  // Glitchy hats
+  const closedHat = addGhostNotes([], resolution, 0.3);
+
+  const tracks = [
+    { name: 'kick', midiNote: 36, pattern: kick },
+    { name: 'snare', midiNote: 38, pattern: snare },
+    { name: 'closed-hat', midiNote: 42, pattern: closedHat },
+  ];
+
+  return createPattern({
+    name: 'IDM Polyrhythm 5:3',
+    genre: 'idm',
+    style: 'polyrhythm',
+    suggestedBPM: 140,
+    bpmRange: [100, 180],
+    intensity: 'high',
+    complexity: 'complex',
+    resolution,
+    tags: ['idm', 'polyrhythm', 'experimental'],
+  }, tracks);
+}
+
+// ============================================================================
+// Ostinato 7/8
+// ============================================================================
+
+export function generateOstinato_7over8() {
+  const grid = createMeterGrid('7/8', 4);
+  const resolution = grid.totalSteps; // 14
+
+  // Asymmetric 2+2+3 grouping
+  const kick = [
+    { step: 0, velocity: 127 },
+    { step: 4, velocity: 115 },
+    { step: 8, velocity: 120 },
+  ];
+
+  const snare = [
+    { step: 2, velocity: 100 },
+    { step: 6, velocity: 95 },
+    { step: 11, velocity: 110 },
+  ];
+
+  const closedHat = eightNotes(resolution, 75);
+
+  const tracks = [
+    { name: 'kick', midiNote: 36, pattern: kick },
+    { name: 'snare', midiNote: 38, pattern: snare },
+    { name: 'closed-hat', midiNote: 42, pattern: closedHat },
+  ];
+
+  return createPattern({
+    name: 'Ostinato 7/8',
+    genre: 'ostinato',
+    style: '7/8',
+    suggestedBPM: 120,
+    bpmRange: [80, 160],
+    timeSignature: '7/8',
+    complexity: 'complex',
+    resolution,
+    tags: ['ostinato', '7/8', 'odd-meter'],
+  }, tracks);
+}
+
+// ============================================================================
 // Export genre generators
 // ============================================================================
 
@@ -428,9 +673,19 @@ export const GENRE_VARIATIONS = {
   techno: ['main'],
   dnb: ['amen', 'two-step'],
   breakbeat: ['funky', 'amen'],
-  'uk-garage': ['main'],
-  idm: ['main'],
+  'uk-garage': ['main', 'broken', 'halftime'],
+  idm: ['main', '5/4', '7/8', 'polyrhythm'],
   'trip-hop': ['main'],
   ostinato: ['3:4', '5:4', '7:8'],
   reggae: ['one-drop', 'rockers', 'steppers']
+};
+
+/** Lookup for variation generators */
+export const VARIATION_GENERATORS = {
+  'uk-garage:broken': generateUKGarage_broken,
+  'uk-garage:halftime': generateUKGarage_halftime,
+  'idm:5/4': generateIDM_5over4,
+  'idm:7/8': generateIDM_7over8,
+  'idm:polyrhythm': generateIDM_polyrhythm,
+  'ostinato:7/8': generateOstinato_7over8,
 };

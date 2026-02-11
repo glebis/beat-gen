@@ -22,15 +22,23 @@ function createRng(seed) {
 // ============================================================================
 
 export const BASS_MODES = {
-  house:     { density: 'medium', style: 'octave-bounce', range: [36, 60] },
-  techno:    { density: 'sparse', style: 'sub',           range: [24, 48] },
-  dnb:       { density: 'high',   style: 'rolling',       range: [30, 54] },
-  breakbeat: { density: 'medium', style: 'funky',         range: [30, 54] },
-  'uk-garage':{ density: 'medium', style: 'bounce',       range: [30, 54] },
-  idm:       { density: 'medium', style: 'chromatic',     range: [30, 54] },
-  'trip-hop':{ density: 'sparse', style: 'deep',          range: [24, 48] },
-  ostinato:  { density: 'medium', style: 'pulse',         range: [30, 54] },
-  reggae:    { density: 'medium', style: 'walking',       range: [30, 54] },
+  house:     { density: 'medium', style: 'octave-bounce', range: [36, 60], durationRange: [1, 4] },
+  techno:    { density: 'sparse', style: 'sub',           range: [24, 48], durationRange: [4, 16] },
+  dnb:       { density: 'high',   style: 'rolling',       range: [30, 54], durationRange: [1, 3] },
+  breakbeat: { density: 'medium', style: 'funky',         range: [30, 54], durationRange: [1, 4] },
+  'uk-garage':{ density: 'medium', style: 'bounce',       range: [30, 54], durationRange: [1, 6] },
+  idm:       { density: 'medium', style: 'chromatic',     range: [30, 54], durationRange: [1, 4] },
+  'trip-hop':{ density: 'sparse', style: 'deep',          range: [24, 48], durationRange: [4, 16] },
+  ostinato:  { density: 'medium', style: 'pulse',         range: [30, 54], durationRange: [2, 6] },
+  reggae:    { density: 'medium', style: 'walking',       range: [30, 54], durationRange: [2, 6] },
+};
+
+// Section-specific bass style overrides
+const SECTION_BASS_STYLES = {
+  'bass-drop':  'long-sub',
+  'bass-drop2': 'long-sub',
+  'breakdown':  'deep',
+  'build':      'sub',
 };
 
 /**
@@ -57,8 +65,9 @@ export function generateBass(opts) {
 
   const inst = GM_INSTRUMENTS.bass;
   const pattern = [];
+  const activeStyle = opts._styleOverride || mode.style;
 
-  switch (mode.style) {
+  switch (activeStyle) {
     case 'octave-bounce':
       generateOctaveBounce(pattern, bassNotes, progression, key, scale, resolution, rootSemitone, rng);
       break;
@@ -86,6 +95,15 @@ export function generateBass(opts) {
     case 'pulse':
       generatePulse(pattern, bassNotes, progression, key, scale, resolution, rootSemitone, rng);
       break;
+    case 'long-sub':
+      generateLongSub(pattern, bassNotes, progression, key, scale, resolution, rootSemitone, rng);
+      break;
+    case 'acid':
+      generateAcid(pattern, bassNotes, progression, key, scale, resolution, rootSemitone, rng);
+      break;
+    case 'syncopated-long':
+      generateSyncopatedLong(pattern, bassNotes, progression, key, scale, resolution, rootSemitone, rng);
+      break;
     default:
       generateOctaveBounce(pattern, bassNotes, progression, key, scale, resolution, rootSemitone, rng);
   }
@@ -97,6 +115,21 @@ export function generateBass(opts) {
     instrument: inst.program,
     pattern,
   };
+}
+
+/**
+ * Generate bass with section-aware style selection
+ * @param {Object} opts - Same as generateBass
+ * @param {string} sectionName - Current section name
+ * @param {number} energy - Section energy 0-1
+ * @returns {Object} Track object
+ */
+export function generateBassForSection(opts, sectionName, energy) {
+  const styleOverride = SECTION_BASS_STYLES[sectionName];
+  if (styleOverride) {
+    return generateBass({ ...opts, _styleOverride: styleOverride });
+  }
+  return generateBass(opts);
 }
 
 // ============================================================================
@@ -268,6 +301,83 @@ function generatePulse(pattern, bassNotes, progression, key, scale, resolution, 
     // Repeated pulse on root
     for (let s = 0; s < stepsPerChord && offset + s < resolution; s += 4) {
       pattern.push({ step: offset + s, velocity: 105, pitch: rootNote, duration: 3 });
+    }
+  }
+}
+
+/**
+ * Long-sub: whole-bar sustained root notes for bass-drop sections
+ */
+function generateLongSub(pattern, bassNotes, progression, key, scale, resolution, root, rng) {
+  const stepsPerChord = Math.floor(resolution / progression.length);
+  for (let i = 0; i < progression.length; i++) {
+    const offset = i * stepsPerChord;
+    const rootNote = getRootForDegree(bassNotes, progression[i], key, scale, root);
+    // One massive sustained note per chord change
+    pattern.push({ step: offset, velocity: 120, pitch: rootNote, duration: stepsPerChord });
+    // Optional sub-octave ghost hit for weight
+    if (rng() > 0.5 && rootNote - 12 >= 24) {
+      const ghostStep = offset + Math.floor(stepsPerChord * 0.6);
+      if (ghostStep < resolution) {
+        pattern.push({ step: ghostStep, velocity: 70, pitch: rootNote - 12, duration: Math.floor(stepsPerChord * 0.3) });
+      }
+    }
+  }
+}
+
+/**
+ * Acid: TB-303-style with variable durations, accents, and slides
+ */
+function generateAcid(pattern, bassNotes, progression, key, scale, resolution, root, rng) {
+  const stepsPerChord = Math.floor(resolution / progression.length);
+  for (let i = 0; i < progression.length; i++) {
+    const offset = i * stepsPerChord;
+    const rootNote = getRootForDegree(bassNotes, progression[i], key, scale, root);
+    const fifth = getFifthForDegree(bassNotes, progression[i], key, scale, root);
+
+    let s = 0;
+    while (s < stepsPerChord && offset + s < resolution) {
+      const isAccent = rng() > 0.6;
+      const vel = isAccent ? 115 + Math.floor(rng() * 12) : 80 + Math.floor(rng() * 20);
+      const dur = 1 + Math.floor(rng() * 7); // 1-8 steps
+      // Pitch: root, fifth, or chromatic neighbor
+      let pitch = rootNote;
+      const pitchChoice = rng();
+      if (pitchChoice > 0.7) pitch = fifth;
+      else if (pitchChoice > 0.5) pitch = rootNote + (rng() > 0.5 ? 1 : -1); // chromatic
+
+      pattern.push({ step: offset + s, velocity: Math.min(vel, 127), pitch, duration: dur });
+      s += dur + (rng() > 0.3 ? 0 : 1); // occasional gap
+    }
+  }
+}
+
+/**
+ * Syncopated-long: off-beat placement with long durations (dub-influenced)
+ */
+function generateSyncopatedLong(pattern, bassNotes, progression, key, scale, resolution, root, rng) {
+  const stepsPerChord = Math.floor(resolution / progression.length);
+  for (let i = 0; i < progression.length; i++) {
+    const offset = i * stepsPerChord;
+    const rootNote = getRootForDegree(bassNotes, progression[i], key, scale, root);
+
+    // Off-beat start (step 1 or 3 instead of 0)
+    const offbeatShift = rng() > 0.5 ? 1 : 3;
+    const start = offset + Math.min(offbeatShift, stepsPerChord - 1);
+    const dur = 4 + Math.floor(rng() * 5); // 4-8 steps
+
+    pattern.push({ step: start, velocity: 100 + Math.floor(rng() * 15), pitch: rootNote, duration: dur });
+
+    // Second hit deeper in the bar
+    const secondStart = start + dur + 1;
+    if (secondStart < offset + stepsPerChord && secondStart < resolution) {
+      const remaining = offset + stepsPerChord - secondStart;
+      pattern.push({
+        step: secondStart,
+        velocity: 85 + Math.floor(rng() * 15),
+        pitch: rootNote,
+        duration: Math.min(4 + Math.floor(rng() * 4), remaining),
+      });
     }
   }
 }

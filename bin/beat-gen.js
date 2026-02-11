@@ -38,6 +38,7 @@ program
   .option('-d, --duration <seconds>', 'Sample duration', '2')
   .option('-i, --influence <value>', 'Prompt influence (0-1)', '0.5')
   .option('--api-key <key>', '11Labs API key (or use ELEVENLABS_API_KEY env var)')
+  .option('--weirdness <n>', 'Experimental sound level 0-1', '0')
   .action(sampleCommand);
 
 // Compose command
@@ -141,11 +142,15 @@ program
   .option('-o, --output <dir>', 'Output directory', './data/output')
   .option('--render', 'Enable WAV rendering (requires samples + ffmpeg)')
   .option('-s, --samples <dir>', 'Samples directory')
-  .option('--preset <name>', 'Mix preset (clean, compressed, dub)')
+  .option('--preset <name>', 'Mix preset (clean, compressed, dub, pumping, heavy-sidechain)')
   .option('--variants <n>', 'Number of variant mixes to render')
   .option('--stems', 'Also render individual stem WAVs')
   .option('--generate-samples', 'Auto-generate samples via 11Labs if missing')
   .option('--api-key <key>', '11Labs API key (for --generate-samples)')
+  .option('--weirdness <n>', 'Experimental sound level 0-1', '0')
+  .option('--density <n>', 'Note density 0-1', '0.5')
+  .option('--variety <n>', 'Structural variety 0-1', '0.5')
+  .option('--duration <seconds>', 'Target composition length in seconds')
   .action((genre, opts) => {
     // Store genre in options for renderTrackVariants to use
     opts._genre = genre;
@@ -165,9 +170,13 @@ program
   .option('--seed <number>', 'Random seed for reproducibility')
   .option('--variants <n>', 'Number of variant mixes to render', '3')
   .option('-s, --samples <dir>', 'Samples directory')
-  .option('--preset <name>', 'Mix preset (clean, compressed, dub)')
+  .option('--preset <name>', 'Mix preset (clean, compressed, dub, pumping, heavy-sidechain)')
   .option('-o, --output <dir>', 'Output directory', './data/output')
   .option('--api-key <key>', '11Labs API key (auto-generates samples if missing)')
+  .option('--weirdness <n>', 'Experimental sound level 0-1', '0')
+  .option('--density <n>', 'Note density 0-1', '0.5')
+  .option('--variety <n>', 'Structural variety 0-1', '0.5')
+  .option('--duration <seconds>', 'Target composition length in seconds')
   .action(fulltrackCommand);
 
 // Bass command

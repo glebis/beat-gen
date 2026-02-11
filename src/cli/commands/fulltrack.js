@@ -53,14 +53,23 @@ export async function fulltrackCommand(genre, options) {
   }
 
   const progression = options.progression ? options.progression.split(',').map(Number) : undefined;
+  const variety = parseFloat(options.variety ?? 0.5);
+  const density = parseFloat(options.density ?? 0.5);
+  const weirdness = parseFloat(options.weirdness ?? 0);
+  const targetDuration = options.duration ? parseInt(options.duration) : undefined;
 
-  console.log(chalk.cyan(`\nFulltrack: ${genre} | ${key}${scale === 'minor' ? 'm' : ''} | ${tempo} BPM | ${numVariants} variants\n`));
+  console.log(chalk.cyan(`\nFulltrack: ${genre} | ${key}${scale === 'minor' ? 'm' : ''} | ${tempo} BPM | ${numVariants} variants`));
+  if (variety !== 0.5 || density !== 0.5 || weirdness > 0) {
+    console.log(chalk.gray(`  variety=${variety} density=${density} weirdness=${weirdness}`));
+  }
+  console.log('');
 
   // ── Step 1: Generate arrangement ──
   console.log(chalk.blue('1/5 Generating arrangement...'));
 
   const arrangement = generateArrangement({
     genre, key, scale, tempo, resolution, progression, seed,
+    variety, density, duration: targetDuration,
   });
 
   const totalBars = arrangement.metadata.totalBars;
@@ -120,7 +129,7 @@ export async function fulltrackCommand(genre, options) {
       if (inst.variants) maxAvailable = Math.max(maxAvailable, inst.variants);
     }
   }
-  for (const inst of ['bass', 'lead', 'pad']) {
+  for (const inst of ['bass', 'lead', 'pad', 'vocalChop', 'stab', 'texture', 'atmosphere', 'noise', 'scratch']) {
     const fv = await countVariants(samplesDir, inst);
     if (fv > 0) maxAvailable = Math.max(maxAvailable, fv);
   }
@@ -214,6 +223,7 @@ async function ensureSamples(genre, samplesDir, variants, options) {
       variants,
       outputDir: samplesDir,
       apiKey,
+      weirdness: parseFloat(options.weirdness ?? 0),
     });
   }
 

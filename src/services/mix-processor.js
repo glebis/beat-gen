@@ -13,8 +13,15 @@ const PRESETS = {
       'bass':       { gain: 0,  highpass: null, lowpass: 800,  compressor: null },
       'lead':       { gain: -2, highpass: 200,  lowpass: null, compressor: null },
       'pad':        { gain: -4, highpass: 100,  lowpass: 8000, compressor: null },
+      'vocalChop':  { gain: -3, highpass: 300,  lowpass: null, compressor: null },
+      'stab':       { gain: -2, highpass: 200,  lowpass: null, compressor: null },
+      'texture':    { gain: -8, highpass: 100,  lowpass: 10000, compressor: null },
+      'atmosphere': { gain: -10, highpass: 80,  lowpass: 8000, compressor: null },
+      'noise':      { gain: -6, highpass: 200,  lowpass: 12000, compressor: null },
+      'scratch':    { gain: -4, highpass: 300,  lowpass: null, compressor: null },
     },
     master: { gain: 0, compressor: null, reverb: null, delay: null },
+    sidechain: null,
   },
 
   compressed: {
@@ -26,6 +33,12 @@ const PRESETS = {
       'bass':       { gain: 1,  highpass: null, lowpass: 800,  compressor: { threshold: -15, ratio: 3, attack: 20, release: 100, makeup: 2 } },
       'lead':       { gain: -1, highpass: 200,  lowpass: null, compressor: null },
       'pad':        { gain: -4, highpass: 100,  lowpass: 8000, compressor: null },
+      'vocalChop':  { gain: -3, highpass: 300,  lowpass: null, compressor: null },
+      'stab':       { gain: -2, highpass: 200,  lowpass: null, compressor: null },
+      'texture':    { gain: -8, highpass: 100,  lowpass: 10000, compressor: null },
+      'atmosphere': { gain: -10, highpass: 80,  lowpass: 8000, compressor: null },
+      'noise':      { gain: -6, highpass: 200,  lowpass: 12000, compressor: null },
+      'scratch':    { gain: -4, highpass: 300,  lowpass: null, compressor: null },
     },
     master: {
       gain: 0,
@@ -33,6 +46,7 @@ const PRESETS = {
       reverb: null,
       delay: null,
     },
+    sidechain: null,
   },
 
   dub: {
@@ -46,12 +60,73 @@ const PRESETS = {
       'bass':       { gain: 2,  highpass: null, lowpass: 600,  compressor: null },
       'lead':       { gain: -3, highpass: 300,  lowpass: null, compressor: null },
       'pad':        { gain: -5, highpass: 200,  lowpass: 6000, compressor: null },
+      'texture':    { gain: -8, highpass: 100,  lowpass: 8000, compressor: null },
+      'atmosphere': { gain: -10, highpass: 80,  lowpass: 6000, compressor: null },
     },
     master: {
       gain: 0,
       compressor: { threshold: -12, ratio: 4, attack: 10, release: 200, makeup: 4 },
       reverb: { delays: '40|53', decays: '0.4|0.3', wet: 0.2 },
       delay: { time: 375, decay: 0.5, wet: 0.3 },
+    },
+    sidechain: null,
+  },
+
+  pumping: {
+    tracks: {
+      'closed-hat': { gain: -5, highpass: 300, lowpass: null, compressor: null },
+      'open-hat':   { gain: -6, highpass: 300, lowpass: null, compressor: null },
+      'bass':       { gain: 0,  highpass: null, lowpass: 800,  compressor: null },
+      'lead':       { gain: -2, highpass: 200,  lowpass: null, compressor: null },
+      'pad':        { gain: -4, highpass: 100,  lowpass: 8000, compressor: null },
+      'vocalChop':  { gain: -3, highpass: 300,  lowpass: null, compressor: null },
+      'stab':       { gain: -2, highpass: 200,  lowpass: null, compressor: null },
+      'texture':    { gain: -8, highpass: 100,  lowpass: 10000, compressor: null },
+      'atmosphere': { gain: -10, highpass: 80,  lowpass: 8000, compressor: null },
+    },
+    master: {
+      gain: 0,
+      compressor: null,
+      reverb: null,
+      delay: null,
+    },
+    sidechain: {
+      source: 'kick',
+      targets: ['bass', 'pad', 'lead', 'texture', 'atmosphere'],
+      threshold: 0.02,
+      ratio: 10,
+      attack: 5,
+      release: 200,
+    },
+  },
+
+  'heavy-sidechain': {
+    tracks: {
+      'closed-hat': { gain: -5, highpass: 300, lowpass: null, compressor: null },
+      'open-hat':   { gain: -6, highpass: 300, lowpass: null, compressor: null },
+      'bass':       { gain: 1,  highpass: null, lowpass: 800,  compressor: null },
+      'lead':       { gain: -1, highpass: 200,  lowpass: null, compressor: null },
+      'pad':        { gain: -3, highpass: 100,  lowpass: 8000, compressor: null },
+      'vocalChop':  { gain: -3, highpass: 300,  lowpass: null, compressor: null },
+      'stab':       { gain: -2, highpass: 200,  lowpass: null, compressor: null },
+      'texture':    { gain: -6, highpass: 100,  lowpass: 10000, compressor: null },
+      'atmosphere': { gain: -8, highpass: 80,   lowpass: 8000, compressor: null },
+      'noise':      { gain: -6, highpass: 200,  lowpass: 12000, compressor: null },
+      'scratch':    { gain: -4, highpass: 300,  lowpass: null, compressor: null },
+    },
+    master: {
+      gain: 0,
+      compressor: { threshold: -10, ratio: 6, attack: 5, release: 150, makeup: 5 },
+      reverb: null,
+      delay: null,
+    },
+    sidechain: {
+      source: 'kick',
+      targets: ['bass', 'pad', 'lead', 'vocalChop', 'stab', 'texture', 'atmosphere', 'noise'],
+      threshold: 0.01,
+      ratio: 20,
+      attack: 2,
+      release: 100,
     },
   },
 };
@@ -149,14 +224,62 @@ export function buildBusFilter(events, duration, mixConfig) {
     processedBusLabels.push(outLabel);
   }
 
+  // ── Phase 3.5: Sidechain compression ──
+  let finalBusLabels = [...processedBusLabels];
+  const sc = config.sidechain;
+
+  if (sc && sc.source && sc.targets && sc.targets.length > 0) {
+    const sourceLabel = `trk_${sanitizeLabel(sc.source)}`;
+    const sourceIdx = finalBusLabels.indexOf(sourceLabel);
+
+    if (sourceIdx >= 0) {
+      // Split source: one dry copy + N copies for sidechain keys
+      const targets = sc.targets
+        .map(t => `trk_${sanitizeLabel(t)}`)
+        .filter(t => finalBusLabels.includes(t));
+
+      if (targets.length > 0) {
+        const splitCount = 1 + targets.length;
+        const dryLabel = `${sourceLabel}_dry`;
+        const keyLabels = targets.map((_, i) => `sc_key_${i}`);
+        const splitOut = [`[${dryLabel}]`, ...keyLabels.map(l => `[${l}]`)].join('');
+        filters.push(`[${sourceLabel}]asplit=${splitCount}${splitOut}`);
+
+        // Replace source in bus labels with dry copy
+        finalBusLabels[sourceIdx] = dryLabel;
+
+        // Apply sidechaincompress to each target
+        for (let i = 0; i < targets.length; i++) {
+          const targetLabel = targets[i];
+          const targetIdx = finalBusLabels.indexOf(targetLabel);
+          if (targetIdx < 0) continue;
+
+          const scOutLabel = `${targetLabel}_sc`;
+          const scParams = [
+            `threshold=${sc.threshold || 0.02}`,
+            `ratio=${sc.ratio || 10}`,
+            `attack=${sc.attack || 5}`,
+            `release=${sc.release || 200}`,
+          ].join(':');
+
+          filters.push(
+            `[${targetLabel}][${keyLabels[i]}]sidechaincompress=${scParams}[${scOutLabel}]`
+          );
+
+          finalBusLabels[targetIdx] = scOutLabel;
+        }
+      }
+    }
+  }
+
   // ── Phase 4: Mix track buses to master ──
   const masterLabel = 'master';
-  if (processedBusLabels.length === 1) {
-    filters.push(`[${processedBusLabels[0]}]acopy[${masterLabel}]`);
+  if (finalBusLabels.length === 1) {
+    filters.push(`[${finalBusLabels[0]}]acopy[${masterLabel}]`);
   } else {
-    const busInputs = processedBusLabels.map(l => `[${l}]`).join('');
+    const busInputs = finalBusLabels.map(l => `[${l}]`).join('');
     filters.push(
-      `${busInputs}amix=inputs=${processedBusLabels.length}:duration=first:normalize=0[${masterLabel}]`
+      `${busInputs}amix=inputs=${finalBusLabels.length}:duration=first:normalize=0[${masterLabel}]`
     );
   }
 
@@ -268,11 +391,12 @@ function buildMasterChain(filters, inputLabel, masterConfig) {
  * Validate and fill defaults in mix config
  */
 function validateMixConfig(config) {
-  if (!config) return { tracks: {}, master: { ...DEFAULT_MASTER } };
+  if (!config) return { tracks: {}, master: { ...DEFAULT_MASTER }, sidechain: null };
 
   const result = {
     tracks: {},
     master: { ...DEFAULT_MASTER, ...(config.master || {}) },
+    sidechain: config.sidechain || null,
   };
 
   // Validate tracks

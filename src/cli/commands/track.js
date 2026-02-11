@@ -42,9 +42,13 @@ export async function trackCommand(genre, options) {
   const trackList = options.tracks ? options.tracks.split(',') : undefined;
   const sectionOverride = options.sections ? options.sections.split(',') : undefined;
   const progression = options.progression ? options.progression.split(',').map(Number) : undefined;
+  const variety = parseFloat(options.variety ?? 0.5);
+  const density = parseFloat(options.density ?? 0.5);
+  const duration = options.duration ? parseInt(options.duration) : undefined;
 
   const arrangement = generateArrangement({
     genre, key, scale, tempo, resolution, trackList, sectionOverride, progression, seed,
+    variety, density, duration,
   });
 
   // --json: raw arrangement to stdout
@@ -150,7 +154,7 @@ async function renderTrackVariants(arrangement, trackDir, options) {
   }
 
   // Also check actual files
-  for (const inst of ['bass', 'lead', 'pad']) {
+  for (const inst of ['bass', 'lead', 'pad', 'vocalChop', 'stab', 'texture', 'atmosphere', 'noise', 'scratch']) {
     const fileVariants = await countVariants(samplesDir, inst);
     if (fileVariants > 0) {
       maxVariants = Math.max(maxVariants, fileVariants);

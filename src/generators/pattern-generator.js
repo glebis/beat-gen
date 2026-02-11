@@ -153,6 +153,128 @@ export function sixteenNotes(resolution, baseVelocity = 70) {
 }
 
 // ============================================================================
+// Euclidean Rhythms (Bjorklund algorithm)
+// ============================================================================
+
+/**
+ * Generate a Euclidean rhythm pattern
+ * Distributes `pulses` as evenly as possible across `steps`
+ * @param {number} pulses - Number of active hits
+ * @param {number} steps - Total steps in the pattern
+ * @param {number} [rotation=0] - Rotate pattern by N steps
+ * @returns {number[]} Array of 0s and 1s
+ */
+export function euclideanRhythm(pulses, steps, rotation = 0) {
+  if (pulses >= steps) return Array(steps).fill(1);
+  if (pulses <= 0) return Array(steps).fill(0);
+
+  // Bjorklund algorithm
+  let pattern = [];
+  let counts = [];
+  let remainders = [];
+  let divisor = steps - pulses;
+  remainders.push(pulses);
+  let level = 0;
+
+  while (true) {
+    counts.push(Math.floor(divisor / remainders[level]));
+    remainders.push(divisor % remainders[level]);
+    divisor = remainders[level];
+    level++;
+    if (remainders[level] <= 1) break;
+  }
+  counts.push(divisor);
+
+  function build(lvl) {
+    if (lvl === -1) {
+      pattern.push(0);
+    } else if (lvl === -2) {
+      pattern.push(1);
+    } else {
+      for (let i = 0; i < counts[lvl]; i++) build(lvl - 1);
+      if (remainders[lvl] !== 0) build(lvl - 2);
+    }
+  }
+
+  build(level);
+
+  // Rotate
+  if (rotation !== 0) {
+    const r = ((rotation % steps) + steps) % steps;
+    pattern = [...pattern.slice(r), ...pattern.slice(0, r)];
+  }
+
+  return pattern;
+}
+
+/**
+ * Convert Euclidean rhythm to step pattern with velocity
+ * @param {number} pulses
+ * @param {number} steps
+ * @param {number} [velocity=100]
+ * @param {number} [rotation=0]
+ * @returns {Array<{step: number, velocity: number}>}
+ */
+export function euclideanToSteps(pulses, steps, velocity = 100, rotation = 0) {
+  const rhythm = euclideanRhythm(pulses, steps, rotation);
+  const result = [];
+  for (let i = 0; i < rhythm.length; i++) {
+    if (rhythm[i]) result.push({ step: i, velocity });
+  }
+  return result;
+}
+
+// ============================================================================
+// Odd Meter Grids
+// ============================================================================
+
+/**
+ * Create a meter grid for non-4/4 time signatures
+ * @param {string} timeSignature - e.g. '5/4', '7/8', '3/4'
+ * @param {number} [subdivisions=4] - Subdivisions per beat
+ * @returns {{ beats: number, stepsPerBeat: number, totalSteps: number }}
+ */
+export function createMeterGrid(timeSignature, subdivisions = 4) {
+  const [numerator, denominator] = timeSignature.split('/').map(Number);
+  const stepsPerBeat = denominator === 8 ? Math.floor(subdivisions / 2) : subdivisions;
+  return {
+    beats: numerator,
+    stepsPerBeat,
+    totalSteps: numerator * stepsPerBeat,
+  };
+}
+
+// ============================================================================
+// Polyrhythm Builder
+// ============================================================================
+
+/**
+ * Create interlocking polyrhythmic patterns
+ * @param {number} totalSteps - Total grid resolution
+ * @param {number} ratio1 - First rhythm cycle length
+ * @param {number} ratio2 - Second rhythm cycle length
+ * @param {number} [vel1=110] - Velocity for rhythm 1
+ * @param {number} [vel2=90] - Velocity for rhythm 2
+ * @returns {{ layer1: Array, layer2: Array }}
+ */
+export function polyrhythmPattern(totalSteps, ratio1, ratio2, vel1 = 110, vel2 = 90) {
+  const interval1 = totalSteps / ratio1;
+  const interval2 = totalSteps / ratio2;
+
+  const layer1 = [];
+  for (let i = 0; i < ratio1; i++) {
+    layer1.push({ step: Math.round(i * interval1), velocity: vel1 });
+  }
+
+  const layer2 = [];
+  for (let i = 0; i < ratio2; i++) {
+    layer2.push({ step: Math.round(i * interval2), velocity: vel2 });
+  }
+
+  return { layer1, layer2 };
+}
+
+// ============================================================================
 // Humanization
 // ============================================================================
 

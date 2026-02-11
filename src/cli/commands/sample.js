@@ -41,10 +41,12 @@ export async function sampleCommand(prompts, options) {
     const totalCalls = instrumentCount * variants;
     console.log(chalk.yellow(`This will make ${totalCalls} API calls to 11Labs.\n`));
 
+    const weirdness = parseFloat(options.weirdness ?? 0);
     const { results, metadataPath } = await generateInstrumentKit(genre, {
       variants,
       outputDir,
       apiKey: options.apiKey,
+      weirdness,
     });
 
     printResults(results.map(r => ({
