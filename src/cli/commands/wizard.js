@@ -166,13 +166,13 @@ export async function wizardCommand(options) {
  * Returns samplesDir path or null if unavailable.
  */
 async function pickSamples(genre, options) {
-  const genreDir = `./samples/${genre}`;
+  const genreDir = `./data/samples/${genre}`;
   const hasExisting = await hasSampleFiles(genreDir);
   let apiKey = options.apiKey || process.env.ELEVENLABS_API_KEY || null;
 
   const choices = [];
   if (hasExisting) {
-    choices.push({ name: `Use existing ./samples/${genre}`, value: 'existing' });
+    choices.push({ name: `Use existing ./data/samples/${genre}`, value: 'existing' });
   }
   if (apiKey) {
     choices.push({ name: 'Generate new samples via ElevenLabs', value: 'generate' });
@@ -180,7 +180,7 @@ async function pickSamples(genre, options) {
 
   if (choices.length === 0) {
     // No samples and no API key -- offer to enter one
-    console.log(chalk.yellow(`\n  No samples in ./samples/${genre} and no ElevenLabs API key set.`));
+    console.log(chalk.yellow(`\n  No samples in ./data/samples/${genre} and no ElevenLabs API key set.`));
     const enterKey = await confirm({ message: 'Enter an ElevenLabs API key to generate samples?', default: true });
     if (!enterKey) return null;
 
@@ -222,10 +222,10 @@ async function pickSamples(genre, options) {
     });
     const coreKit = ['kick', 'snare', 'hihat', 'hihat-open', 'clap'];
     const prompts = coreKit.map(drum => `${drum} ${description.trim()}`);
-    console.log(chalk.gray(`\n  Generating custom kit into ./samples/${genre} ...`));
+    console.log(chalk.gray(`\n  Generating custom kit into ./data/samples/${genre} ...`));
     await generateBatchSamples(prompts, { outputDir: genreDir, apiKey });
   } else {
-    console.log(chalk.gray(`\n  Generating ${kitChoice} kit into ./samples/${genre} ...`));
+    console.log(chalk.gray(`\n  Generating ${kitChoice} kit into ./data/samples/${genre} ...`));
     await generateDrumKit(kitChoice, { outputDir: genreDir, apiKey });
   }
 

@@ -8,7 +8,7 @@ import { renderToWAV } from './audio-renderer.js';
  */
 export async function generateHybridLoops(genres, options = {}) {
   const {
-    samplesDir = './data/audio-samples',
+    samplesDir = './data/samples',
     outputDir = './data/output/hybrid',
     patternsDir = './data/generated-patterns',
     variants = 4,

@@ -15,6 +15,7 @@ import { listCommand } from '../src/cli/commands/list.js';
 import { bassCommand } from '../src/cli/commands/bass.js';
 import { melodyCommand } from '../src/cli/commands/melody.js';
 import { trackCommand } from '../src/cli/commands/track.js';
+import { fulltrackCommand } from '../src/cli/commands/fulltrack.js';
 import { visualizeCommand } from '../src/cli/commands/visualize.js';
 
 const program = new Command();
@@ -27,10 +28,13 @@ program
 // Sample generation command
 program
   .command('sample')
-  .description('Generate drum samples using 11Labs AI')
+  .description('Generate samples using 11Labs AI (drums + instruments)')
   .argument('[prompts...]', 'Sample descriptions (e.g., "808 kick", "snare")')
   .option('-k, --kit <name>', 'Generate preset drum kit (808, acoustic, electronic)')
-  .option('-o, --output <dir>', 'Output directory', './samples')
+  .option('--instruments', 'Generate pitched instrument samples (bass, lead, pad)')
+  .option('-g, --genre <genre>', 'Genre for instrument samples (house, techno, etc.)')
+  .option('--variants <n>', 'Number of variants per instrument', '3')
+  .option('-o, --output <dir>', 'Output directory', './data/samples')
   .option('-d, --duration <seconds>', 'Sample duration', '2')
   .option('-i, --influence <value>', 'Prompt influence (0-1)', '0.5')
   .option('--api-key <key>', '11Labs API key (or use ELEVENLABS_API_KEY env var)')
@@ -76,7 +80,7 @@ program
   .description('Render pattern to WAV using generated samples (requires ffmpeg)')
   .argument('<pattern>', 'Pattern file (JSON)')
   .option('-b, --bpm <tempo>', 'Override tempo (BPM)')
-  .option('-s, --samples <dir>', 'Samples directory', './samples')
+  .option('-s, --samples <dir>', 'Samples directory', './data/samples')
   .option('-o, --output <file>', 'Output WAV file', 'output.wav')
   .option('--sample-rate <rate>', 'Sample rate in Hz', '44100')
   .option('--bit-depth <bits>', 'Bit depth', '16')
@@ -106,7 +110,7 @@ program
   .option('-v, --variants <number>', 'Number of variants to generate', '4')
   .option('-t, --tempo <bpm>', 'Override tempo (BPM)')
   .option('-o, --output <dir>', 'Output directory', './data/output/hybrid')
-  .option('-s, --samples-dir <dir>', 'Samples base directory', './data/audio-samples')
+  .option('-s, --samples-dir <dir>', 'Samples base directory', './data/samples')
   .option('-p, --patterns <dir>', 'Patterns directory', './data/generated-patterns')
   .action(hybridCommand);
 
@@ -122,7 +126,7 @@ program
 // Track command (full arrangement)
 program
   .command('track')
-  .description('Generate full multi-track arrangement')
+  .description('Generate full multi-track arrangement (+ optional WAV render)')
   .argument('<genre>', 'Genre (house, techno, dnb, etc.)')
   .option('-k, --key <key>', 'Musical key', 'C')
   .option('--scale <scale>', 'Scale', 'minor')
@@ -134,8 +138,37 @@ program
   .option('--seed <number>', 'Random seed for reproducibility')
   .option('--json', 'JSON output to stdout')
   .option('-q, --quiet', 'Suppress progress output')
-  .option('-o, --output <dir>', 'Output directory', './output')
-  .action(trackCommand);
+  .option('-o, --output <dir>', 'Output directory', './data/output')
+  .option('--render', 'Enable WAV rendering (requires samples + ffmpeg)')
+  .option('-s, --samples <dir>', 'Samples directory')
+  .option('--preset <name>', 'Mix preset (clean, compressed, dub)')
+  .option('--variants <n>', 'Number of variant mixes to render')
+  .option('--stems', 'Also render individual stem WAVs')
+  .option('--generate-samples', 'Auto-generate samples via 11Labs if missing')
+  .option('--api-key <key>', '11Labs API key (for --generate-samples)')
+  .action((genre, opts) => {
+    // Store genre in options for renderTrackVariants to use
+    opts._genre = genre;
+    return trackCommand(genre, opts);
+  });
+
+// Fulltrack command (end-to-end pipeline)
+program
+  .command('fulltrack')
+  .description('Full pipeline: generate arrangement + samples + render WAV variants')
+  .argument('<genre>', 'Genre (house, techno, dnb, etc.)')
+  .option('-k, --key <key>', 'Musical key', 'C')
+  .option('--scale <scale>', 'Scale', 'minor')
+  .option('-b, --bpm <tempo>', 'BPM (default: genre-appropriate)')
+  .option('-r, --resolution <steps>', 'Steps per bar', '16')
+  .option('--progression <list>', 'Chord degrees (e.g. "1,4,5,1")')
+  .option('--seed <number>', 'Random seed for reproducibility')
+  .option('--variants <n>', 'Number of variant mixes to render', '3')
+  .option('-s, --samples <dir>', 'Samples directory')
+  .option('--preset <name>', 'Mix preset (clean, compressed, dub)')
+  .option('-o, --output <dir>', 'Output directory', './data/output')
+  .option('--api-key <key>', '11Labs API key (auto-generates samples if missing)')
+  .action(fulltrackCommand);
 
 // Bass command
 program
@@ -230,19 +263,30 @@ ${chalk.cyan('Examples:')}
   $ beat-gen export pattern.json --format midi
 
   ${chalk.gray('# Render pattern to WAV with samples')}
-  $ beat-gen render pattern.json --samples ./samples/808/ --output beat.wav
+  $ beat-gen render pattern.json --samples ./data/samples/808/ --output beat.wav
 
   ${chalk.gray('# Render with mix preset (tame hats, add compression)')}
-  $ beat-gen render pattern.json --samples ./samples/808/ --preset clean
-  $ beat-gen render pattern.json --samples ./samples/808/ --preset dub
+  $ beat-gen render pattern.json --samples ./data/samples/808/ --preset clean
+  $ beat-gen render pattern.json --samples ./data/samples/808/ --preset dub
 
   ${chalk.gray('# Render with custom mix config')}
-  $ beat-gen render pattern.json --samples ./samples/808/ --mix my-mix.json
+  $ beat-gen render pattern.json --samples ./data/samples/808/ --mix my-mix.json
 
   ${chalk.gray('# Generate pattern library')}
   $ beat-gen generate house --count 5
   $ beat-gen generate --all --count 10
   $ beat-gen generate --list
+
+  ${chalk.gray('# Generate instrument samples (bass, lead, pad)')}
+  $ beat-gen sample --instruments --genre house --variants 3
+  $ beat-gen sample --kit 808 --instruments --genre house -o ./data/samples/house
+
+  ${chalk.gray('# Generate track with WAV rendering')}
+  $ beat-gen track house --key Cm --render --samples ./data/samples/house --stems --variants 3
+
+  ${chalk.gray('# Full pipeline (generate + render + stems in one shot)')}
+  $ beat-gen fulltrack house --key Cm --variants 3 --preset compressed
+  $ beat-gen fulltrack techno --bpm 135 --preset dub --api-key sk_xxx
 
   ${chalk.gray('# Generate hybrid loops')}
   $ beat-gen hybrid idm uk-garage house --variants 4

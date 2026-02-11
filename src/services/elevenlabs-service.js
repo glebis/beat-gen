@@ -5,6 +5,58 @@ import { formatSampleName } from '../utils/gm-drum-map.js';
 
 const ELEVENLABS_API_BASE = 'https://api.elevenlabs.io/v1';
 
+// ── Instrument kit definitions per genre ────────────────────────────
+
+const INSTRUMENT_KITS = {
+  house: {
+    bass: { prompt: 'sustained deep synth bass note C2 electronic house music warm', referencePitch: 36, duration: 3 },
+    lead: { prompt: 'sustained synth lead note C4 electronic house music bright square wave', referencePitch: 60, duration: 3 },
+    pad:  { prompt: 'sustained ambient synth pad chord C4 electronic house music warm atmospheric', referencePitch: 60, duration: 5 },
+  },
+  techno: {
+    bass: { prompt: 'sustained dark techno sub bass note C2 deep rumbling electronic', referencePitch: 36, duration: 3 },
+    lead: { prompt: 'sustained techno synth lead stab C4 industrial metallic sharp', referencePitch: 60, duration: 2 },
+    pad:  { prompt: 'sustained dark ambient drone pad C4 techno atmospheric evolving', referencePitch: 60, duration: 5 },
+  },
+  dnb: {
+    bass: { prompt: 'sustained reese bass note C2 drum and bass deep growling wobble', referencePitch: 36, duration: 3 },
+    lead: { prompt: 'sustained bright synth lead C4 drum and bass energetic sharp', referencePitch: 60, duration: 2 },
+    pad:  { prompt: 'sustained atmospheric pad C4 drum and bass liquid ethereal', referencePitch: 60, duration: 5 },
+  },
+  reggae: {
+    bass: { prompt: 'sustained warm dub bass note C2 reggae deep round clean', referencePitch: 36, duration: 3 },
+    lead: { prompt: 'sustained melodica note C4 reggae dub clean bright', referencePitch: 60, duration: 3 },
+    pad:  { prompt: 'sustained organ chord C4 reggae warm vintage smooth', referencePitch: 60, duration: 5 },
+  },
+  'trip-hop': {
+    bass: { prompt: 'sustained deep mellow bass note C2 trip-hop downtempo warm analog', referencePitch: 36, duration: 4 },
+    lead: { prompt: 'sustained ethereal synth note C4 trip-hop atmospheric dreamy', referencePitch: 60, duration: 3 },
+    pad:  { prompt: 'sustained ambient pad C4 trip-hop cinematic dark atmospheric', referencePitch: 60, duration: 6 },
+  },
+  breakbeat: {
+    bass: { prompt: 'sustained punchy bass note C2 breakbeat electronic funky', referencePitch: 36, duration: 3 },
+    lead: { prompt: 'sustained sharp synth lead C4 breakbeat electronic energetic', referencePitch: 60, duration: 2 },
+    pad:  { prompt: 'sustained warm pad chord C4 breakbeat electronic atmospheric', referencePitch: 60, duration: 5 },
+  },
+  'uk-garage': {
+    bass: { prompt: 'sustained deep garage bass note C2 uk-garage bouncy warm sub', referencePitch: 36, duration: 3 },
+    lead: { prompt: 'sustained bright vocal chop synth C4 uk-garage smooth R&B', referencePitch: 60, duration: 2 },
+    pad:  { prompt: 'sustained lush chord pad C4 uk-garage warm smooth soulful', referencePitch: 60, duration: 5 },
+  },
+  idm: {
+    bass: { prompt: 'sustained glitchy bass note C2 IDM experimental granular', referencePitch: 36, duration: 3 },
+    lead: { prompt: 'sustained digital synth lead C4 IDM experimental crystalline', referencePitch: 60, duration: 2 },
+    pad:  { prompt: 'sustained evolving texture pad C4 IDM ambient experimental', referencePitch: 60, duration: 6 },
+  },
+  ostinato: {
+    bass: { prompt: 'sustained deep orchestral bass note C2 cinematic dark', referencePitch: 36, duration: 4 },
+    lead: { prompt: 'sustained string melody note C4 cinematic orchestral emotional', referencePitch: 60, duration: 3 },
+    pad:  { prompt: 'sustained orchestral string pad C4 cinematic wide atmospheric', referencePitch: 60, duration: 6 },
+  },
+};
+
+export { INSTRUMENT_KITS };
+
 /**
  * Generate sound effect using 11Labs API
  */
@@ -60,7 +112,7 @@ export async function generateSample(prompt, options = {}) {
  */
 export async function generateBatchSamples(prompts, options = {}) {
   const {
-    outputDir = './samples',
+    outputDir = './data/samples',
     format = 'wav',
     apiKey = null,
   } = options;
@@ -149,7 +201,7 @@ export async function generateDrumKit(kitName, options = {}) {
 
   return generateBatchSamples(prompts, {
     ...options,
-    outputDir: options.outputDir || `./samples/${kitName}`,
+    outputDir: options.outputDir || `./data/samples/${kitName}`,
   });
 }
 
@@ -209,7 +261,7 @@ function sanitizeFilename(str) {
  */
 export async function generateSampleVariants(prompt, variants = 3, options = {}) {
   const {
-    outputDir = './samples',
+    outputDir = './data/samples',
     apiKey = null,
   } = options;
 
@@ -277,6 +329,97 @@ export async function generateBatchWithVariants(prompts, variants = 3, options =
   }
 
   return allResults;
+}
+
+/**
+ * Generate instrument samples (bass, lead, pad) for a genre
+ * Creates N variants per instrument and writes samples.json metadata
+ */
+export async function generateInstrumentKit(genre, options = {}) {
+  const {
+    variants = 3,
+    outputDir = `./data/samples/${genre}`,
+    apiKey = null,
+    instruments = null, // null = all, or ['bass', 'lead'] etc.
+  } = options;
+
+  const kit = INSTRUMENT_KITS[genre];
+  if (!kit) {
+    throw new Error(`No instrument kit for genre: ${genre}. Available: ${Object.keys(INSTRUMENT_KITS).join(', ')}`);
+  }
+
+  await fs.mkdir(outputDir, { recursive: true });
+
+  const instrumentNames = instruments || Object.keys(kit);
+  const allResults = [];
+  const metadata = {};
+
+  // Estimate API calls for cost warning
+  const totalCalls = instrumentNames.length * variants;
+  console.log(`Generating ${totalCalls} samples (${instrumentNames.length} instruments x ${variants} variants)`);
+
+  for (const instName of instrumentNames) {
+    const config = kit[instName];
+    if (!config) {
+      console.warn(`Warning: No config for instrument "${instName}" in ${genre} kit`);
+      continue;
+    }
+
+    console.log(`\n--- ${instName} (${variants} variants) ---`);
+
+    for (let v = 1; v <= variants; v++) {
+      const filename = `${instName}-v${v}.mp3`;
+      const outputPath = path.join(outputDir, filename);
+
+      try {
+        const result = await generateSample(config.prompt, {
+          apiKey,
+          duration: config.duration,
+          promptInfluence: 0.5,
+          outputPath,
+        });
+
+        allResults.push({
+          success: true,
+          instrument: instName,
+          variant: v,
+          ...result,
+        });
+
+        console.log(`  v${v}: ${filename}`);
+      } catch (error) {
+        console.error(`  v${v} failed: ${error.message}`);
+        allResults.push({
+          success: false,
+          instrument: instName,
+          variant: v,
+          error: error.message,
+        });
+      }
+
+      // Rate limiting
+      await sleep(1000);
+    }
+
+    metadata[instName] = {
+      referencePitch: config.referencePitch,
+      variants,
+    };
+  }
+
+  // Write samples.json metadata
+  const metadataPath = path.join(outputDir, 'samples.json');
+  await fs.writeFile(metadataPath, JSON.stringify(metadata, null, 2));
+  console.log(`\nMetadata written: ${metadataPath}`);
+
+  return { results: allResults, metadata, metadataPath };
+}
+
+/**
+ * Get available instrument kit genres
+ */
+export function listInstrumentKitGenres() {
+  return Object.keys(INSTRUMENT_KITS);
 }
 
 /**

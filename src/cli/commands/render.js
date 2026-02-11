@@ -23,7 +23,7 @@ export async function renderCommand(patternFile, options) {
   // Load pattern
   if (!patternFile) {
     console.error(chalk.red('Error: Pattern file required'));
-    console.log(chalk.yellow('Usage: beat-gen render pattern.json --samples ./samples/'));
+    console.log(chalk.yellow('Usage: beat-gen render pattern.json --samples ./data/samples/'));
     process.exit(1);
   }
 
@@ -44,7 +44,7 @@ export async function renderCommand(patternFile, options) {
   }
 
   // Verify samples directory
-  const samplesDir = options.samples || './samples';
+  const samplesDir = options.samples || './data/samples';
   try {
     await fs.access(samplesDir);
   } catch {
