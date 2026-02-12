@@ -50,7 +50,11 @@ export function generateMelody(opts) {
   const { genre, key, scale, resolution, tempo, instrument, seed } = opts;
   const rng = createRng(seed);
 
-  const profile = MELODY_PROFILES[genre] || MELODY_PROFILES.house;
+  const baseProfile = MELODY_PROFILES[genre] || MELODY_PROFILES.house;
+  // Allow numeric density override (0-1) from arrangement engine
+  const profile = opts.density != null
+    ? { ...baseProfile, density: opts.density <= 0.33 ? 'sparse' : opts.density >= 0.66 ? 'high' : 'medium' }
+    : baseProfile;
   const inst = GM_INSTRUMENTS[instrument] || GM_INSTRUMENTS.lead;
   const isPad = instrument === 'pad';
 

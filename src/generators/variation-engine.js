@@ -1,5 +1,5 @@
 /**
- * Variation Engine - Generate intro/outro/fill variations
+ * Variation Engine - Generate intro/outro/fill/chorus/breakdown/build/half-time variations
  */
 
 import { randomRange, addGhostNotes } from './pattern-generator.js';
@@ -155,6 +155,188 @@ export function addVariability(pattern, ghostProbability = 0.15) {
       return track;
     })
   };
+}
+
+// ============================================================================
+// Chorus Variation - More energy, ghost notes, velocity boost
+// ============================================================================
+
+export function generateChorus(mainPattern) {
+  const boosted = addVariability(mainPattern, 0.2);
+  return {
+    ...boosted,
+    metadata: {
+      ...mainPattern.metadata,
+      variation: 'chorus',
+      name: `${mainPattern.metadata.name} (Chorus)`
+    },
+    tracks: boosted.tracks.map(track => ({
+      ...track,
+      pattern: track.pattern.map(note => ({
+        ...note,
+        velocity: clamp(Math.floor(note.velocity * 1.1), 1, 127)
+      }))
+    }))
+  };
+}
+
+// ============================================================================
+// Breakdown Variation - Kick only, reduced velocity
+// ============================================================================
+
+export function generateBreakdown(mainPattern) {
+  return {
+    ...mainPattern,
+    metadata: {
+      ...mainPattern.metadata,
+      variation: 'breakdown',
+      name: `${mainPattern.metadata.name} (Breakdown)`
+    },
+    tracks: mainPattern.tracks
+      .filter(track => track.name === 'kick')
+      .map(track => ({
+        ...track,
+        pattern: track.pattern.map(note => ({
+          ...note,
+          velocity: clamp(Math.floor(note.velocity * 0.75), 1, 127)
+        }))
+      }))
+  };
+}
+
+// ============================================================================
+// Build Variation - Progressive density, hats every step in last quarter
+// ============================================================================
+
+export function generateBuild(mainPattern) {
+  const resolution = mainPattern.resolution;
+  const lastQuarter = Math.floor(resolution * 0.75);
+
+  return {
+    ...mainPattern,
+    metadata: {
+      ...mainPattern.metadata,
+      variation: 'build',
+      name: `${mainPattern.metadata.name} (Build)`
+    },
+    tracks: mainPattern.tracks.map(track => {
+      if (track.name === 'closed-hat' || track.name === 'hihat') {
+        // Fill last quarter with rapid hats
+        const existing = track.pattern.filter(n => n.step < lastQuarter);
+        const fillNotes = [];
+        for (let i = lastQuarter; i < resolution; i++) {
+          fillNotes.push({
+            step: i,
+            velocity: 60 + Math.floor((i - lastQuarter) / (resolution - lastQuarter) * 50)
+          });
+        }
+        return { ...track, pattern: [...existing, ...fillNotes] };
+      }
+
+      if (track.name === 'snare') {
+        // Add snare rolls in last quarter
+        const existing = track.pattern.filter(n => n.step < lastQuarter);
+        const rollNotes = [];
+        for (let i = lastQuarter; i < resolution; i += 2) {
+          rollNotes.push({ step: i, velocity: 80 + Math.floor((i - lastQuarter) * 3) });
+        }
+        return { ...track, pattern: [...existing, ...rollNotes] };
+      }
+
+      return track;
+    })
+  };
+}
+
+// ============================================================================
+// Half-time Variation - Keep only notes on even beats (0, 8 in 16-step)
+// ============================================================================
+
+export function generateHalfTime(mainPattern) {
+  const resolution = mainPattern.resolution;
+  const beatLen = resolution / 4;
+
+  return {
+    ...mainPattern,
+    metadata: {
+      ...mainPattern.metadata,
+      variation: 'half-time',
+      name: `${mainPattern.metadata.name} (Half-time)`
+    },
+    tracks: mainPattern.tracks.map(track => {
+      if (track.name === 'kick') {
+        // Keep only downbeats (beat 1 and 3)
+        return {
+          ...track,
+          pattern: track.pattern.filter(n => n.step === 0 || n.step === beatLen * 2)
+        };
+      }
+      // Keep notes that fall on even beats only
+      return {
+        ...track,
+        pattern: track.pattern.filter(n => {
+          const beatPos = n.step / beatLen;
+          return beatPos === Math.floor(beatPos) && Math.floor(beatPos) % 2 === 0;
+        })
+      };
+    })
+  };
+}
+
+// ============================================================================
+// Orchestrators - Generate all variants and merge into multi-pattern format
+// ============================================================================
+
+/**
+ * Generate all drum pattern variants from a main pattern
+ * @param {Object} mainPattern - Full drum pattern with .tracks[]
+ * @returns {Object} { main: pattern, intro: pattern, chorus: pattern, ... }
+ */
+export function generateAllDrumVariants(mainPattern) {
+  return {
+    main:      mainPattern,
+    intro:     generateIntro(mainPattern),
+    chorus:    generateChorus(mainPattern),
+    fill:      generateFill(mainPattern),
+    breakdown: generateBreakdown(mainPattern),
+    build:     generateBuild(mainPattern),
+    'half-time': generateHalfTime(mainPattern),
+    outro:     generateOutro(mainPattern),
+  };
+}
+
+/**
+ * Merge per-variant drum patterns into multi-pattern track format.
+ * Input:  { main: { tracks: [{name:'kick', pattern:[...]}] }, intro: { tracks: [...] }, ... }
+ * Output: [{ name: 'kick', patterns: { main: [...], intro: [...], ... }, pattern: [...] }]
+ *
+ * The `pattern` field is kept for backward compat (set to main pattern).
+ */
+export function mergeDrumVariants(variants) {
+  // Collect all unique drum track names from the main variant
+  const mainTracks = variants.main.tracks;
+  const allTrackNames = [...new Set(mainTracks.map(t => t.name))];
+
+  return allTrackNames.map(trackName => {
+    const mainTrack = mainTracks.find(t => t.name === trackName);
+    const patterns = {};
+
+    for (const [variantName, variantPattern] of Object.entries(variants)) {
+      const varTrack = variantPattern.tracks.find(t => t.name === trackName);
+      if (varTrack) {
+        patterns[variantName] = varTrack.pattern;
+      }
+    }
+
+    return {
+      name: trackName,
+      midiNote: mainTrack.midiNote,
+      channel: mainTrack.channel,
+      instrument: mainTrack.instrument,
+      patterns,
+      pattern: mainTrack.pattern, // legacy fallback
+    };
+  });
 }
 
 // ============================================================================

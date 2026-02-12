@@ -17,7 +17,7 @@ describe('arrangement engine', () => {
       seed: 42,
     });
 
-    assert.equal(arr.version, '2.0');
+    assert.equal(arr.version, '2.1');
     assert.equal(arr.key, 'Cm');
     assert.ok(arr.sections.length > 0, 'Should have sections');
     assert.ok(arr.tracks.length > 0, 'Should have tracks');

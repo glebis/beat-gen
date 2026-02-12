@@ -162,8 +162,30 @@ async function buildEventTimeline(pattern, samplesDir, resolution, tempo, stepsP
 }
 
 /**
+ * Select the right pattern array for a track in a given section.
+ * Fallback chain:
+ *   1. track.patterns[variantHint] (drumVariant or melodyVariant from section)
+ *   2. track.patterns[section.name] (exact section name)
+ *   3. track.patterns.main (default)
+ *   4. track.pattern (legacy v2.0)
+ */
+function selectPatternForSection(track, section) {
+  const patterns = track.patterns;
+  if (!patterns) return track.pattern || [];
+
+  const isDrum = !isPitchedTrack(track);
+  const variantHint = isDrum ? section.drumVariant : section.melodyVariant;
+
+  if (variantHint && patterns[variantHint]) return patterns[variantHint];
+  if (patterns[section.name]) return patterns[section.name];
+  if (patterns.main) return patterns.main;
+  return track.pattern || [];
+}
+
+/**
  * Build timeline for an arrangement with sections.
  * Loops patterns across section bars, respecting activeTracks.
+ * Uses multi-pattern selection per section for v2.1 patterns.
  * For pitched instruments, each note is individually pitch-rendered.
  */
 async function buildArrangementTimeline(pattern, samplesDir, resolution, tempo, stepsPerBeat, barDuration, opts = {}) {
@@ -203,11 +225,13 @@ async function buildArrangementTimeline(pattern, samplesDir, resolution, tempo, 
         );
         if (!isActive) continue;
 
+        const notePattern = selectPatternForSection(track, section);
+
         if (isDrum) {
           const samplePath = drumSampleCache[track.name];
           if (!samplePath) continue;
 
-          for (const note of track.pattern) {
+          for (const note of notePattern) {
             const time = barOffset + (note.step * secondsPerStep);
             const velocity = ((note.velocity || 100) / 127) * energyScale;
 
@@ -226,7 +250,7 @@ async function buildArrangementTimeline(pattern, samplesDir, resolution, tempo, 
           const instMeta = metadata?.[track.name];
           const referencePitch = instMeta?.referencePitch || 60;
 
-          for (const note of track.pattern) {
+          for (const note of notePattern) {
             const time = barOffset + (note.step * secondsPerStep);
             const velocity = ((note.velocity || 100) / 127) * energyScale;
             const targetPitch = note.pitch || referencePitch;

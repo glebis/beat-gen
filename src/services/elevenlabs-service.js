@@ -47,6 +47,9 @@ const INSTRUMENT_KITS = {
     vocalChop:  { prompt: 'female vocal chop ethereal pitched C4 trip-hop downtempo haunting', referencePitch: 60, duration: 2 },
     texture:    { prompt: 'evolving vinyl crackle tape hiss atmospheric lo-fi warm textural', referencePitch: 60, duration: 20 },
     atmosphere: { prompt: 'dark cinematic ambient drone atmospheric trip-hop evolving haunting', referencePitch: 60, duration: 22 },
+    noise:      { prompt: 'vinyl crackle white noise filtered sweep lo-fi warm atmospheric', referencePitch: 60, duration: 10 },
+    stab:       { prompt: 'dark Rhodes chord stab C4 trip-hop vintage compressed warm', referencePitch: 60, duration: 1 },
+    scratch:    { prompt: 'vinyl record scratch turntable lo-fi trip-hop short', referencePitch: 60, duration: 1 },
   },
   breakbeat: {
     bass:       { prompt: 'sustained punchy bass note C2 breakbeat electronic funky', referencePitch: 36, duration: 3 },

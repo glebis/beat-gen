@@ -3,7 +3,7 @@
  */
 
 import { GENRE_GENERATORS } from './genre-templates.js';
-import { generateIntro, generateOutro, generateFill } from './variation-engine.js';
+import { generateAllDrumVariants, mergeDrumVariants } from './variation-engine.js';
 import { generateBass, generateBassForSection } from './bass-generator.js';
 import { generateMelody } from './melody-generator.js';
 import { generateTexture } from './texture-generator.js';
@@ -80,12 +80,15 @@ export const GENRE_ARRANGEMENTS = {
     { name: 'outro',     bars: 4,  tracks: ['pad', 'atmosphere'],              energy: 0.2 },
   ],
   'trip-hop': [
-    { name: 'intro',     bars: 8,  tracks: ['pad', 'atmosphere'],              energy: 0.2 },
-    { name: 'verse',     bars: 16, tracks: ['drums', 'bass', 'pad'],           energy: 0.5 },
-    { name: 'chorus',    bars: 8,  tracks: ['drums', 'bass', 'lead', 'pad', 'vocalChop'], energy: 0.7 },
-    { name: 'verse2',    bars: 16, tracks: ['drums', 'bass', 'pad', 'texture'], energy: 0.5 },
-    { name: 'chorus2',   bars: 8,  tracks: ['drums', 'bass', 'lead', 'pad', 'vocalChop'], energy: 0.7 },
-    { name: 'outro',     bars: 8,  tracks: ['pad', 'atmosphere'],              energy: 0.2 },
+    { name: 'intro',      bars: 8,  tracks: ['pad', 'atmosphere'],                          energy: 0.2 },
+    { name: 'verse',      bars: 16, tracks: ['drums', 'bass', 'pad'],                       energy: 0.5 },
+    { name: 'build',      bars: 4,  tracks: ['drums', 'bass', 'noise'],                     energy: 0.6 },
+    { name: 'chorus',     bars: 8,  tracks: ['drums', 'bass', 'lead', 'pad', 'vocalChop'],  energy: 0.7 },
+    { name: 'breakdown',  bars: 8,  tracks: ['pad', 'atmosphere', 'texture'],                energy: 0.15 },
+    { name: 'verse2',     bars: 16, tracks: ['drums', 'bass', 'pad', 'stab'],               energy: 0.55 },
+    { name: 'bass-solo',  bars: 4,  tracks: ['bass', 'scratch'],                            energy: 0.8 },
+    { name: 'chorus2',    bars: 8,  tracks: ['drums', 'bass', 'lead', 'pad', 'vocalChop', 'texture'], energy: 0.7 },
+    { name: 'outro',      bars: 8,  tracks: ['pad', 'atmosphere'],                          energy: 0.2 },
   ],
   ostinato: [
     { name: 'intro',     bars: 8,  tracks: ['drums'],                          energy: 0.3 },
@@ -115,7 +118,7 @@ const GENRE_EXTRA_TRACKS = {
   techno:      ['noise', 'stab', 'texture', 'atmosphere'],
   dnb:         ['stab', 'noise', 'atmosphere'],
   idm:         ['texture', 'noise', 'scratch', 'vocalChop', 'atmosphere'],
-  'trip-hop':  ['atmosphere', 'vocalChop', 'texture'],
+  'trip-hop':  ['atmosphere', 'vocalChop', 'texture', 'noise', 'stab', 'scratch'],
   breakbeat:   ['stab', 'noise'],
   ostinato:    ['atmosphere', 'texture'],
   reggae:      ['atmosphere'],
@@ -142,6 +145,44 @@ const GENRE_EXTRA_TRACKS = {
  * @param {number} [opts.duration] - Target duration in seconds
  * @returns {Object} Full arrangement pattern
  */
+// ============================================================================
+// Section-to-drum-variant mapping
+// Maps section name patterns to drum variant names from variation-engine
+// ============================================================================
+
+const SECTION_DRUM_VARIANT = {
+  'intro':     'intro',
+  'verse':     'main',
+  'verse2':    'main',
+  'build':     'build',
+  'build2':    'build',
+  'drop':      'chorus',
+  'drop2':     'chorus',
+  'chorus':    'chorus',
+  'chorus2':   'chorus',
+  'breakdown': 'breakdown',
+  'bridge':    'half-time',
+  'interlude': 'half-time',
+  'bass-drop': 'breakdown',
+  'bass-drop2':'breakdown',
+  'bass-solo': 'breakdown',
+  'dub':       'half-time',
+  'outro':     'outro',
+  'part-a':    'main',
+  'part-b':    'chorus',
+  'main':      'main',
+  'variation': 'chorus',
+};
+
+// Section-to-melody density mapping
+const SECTION_MELODY_VARIANT = {
+  'intro': 'sparse', 'outro': 'sparse', 'breakdown': 'sparse', 'bridge': 'sparse',
+  'interlude': 'sparse', 'verse': 'main', 'verse2': 'main', 'dub': 'sparse',
+  'part-a': 'main', 'main': 'main',
+  'chorus': 'dense', 'chorus2': 'dense', 'drop': 'dense', 'drop2': 'dense',
+  'build': 'dense', 'build2': 'dense', 'part-b': 'dense', 'variation': 'dense',
+};
+
 export function generateArrangement(opts) {
   const { genre, key, scale, tempo, resolution, seed } = opts;
   const variety = opts.variety ?? 0.5;
@@ -173,34 +214,91 @@ export function generateArrangement(opts) {
     }
   }
 
-  // Generate drum pattern
+  // ── Drums: generate main + all variants, merge into multi-pattern ──
   const drumGenerator = GENRE_GENERATORS[genre] || GENRE_GENERATORS.house;
   const drumPattern = drumGenerator();
-  const drumTracks = drumPattern.tracks;
+  const drumVariants = generateAllDrumVariants(drumPattern);
+  const drumTracks = mergeDrumVariants(drumVariants);
 
-  // Generate pitched tracks
+  // ── Pitched tracks with multi-pattern support ──
   const progression = opts.progression || pickProgression(genre, rng);
-  const pitchedOpts = { genre, key, scale, resolution, tempo: tempo, progression, seed: seed ? seed + 1 : undefined };
+  const pitchedOpts = { genre, key, scale, resolution, tempo, progression, seed: seed ? seed + 1 : undefined };
 
   const tracks = [...drumTracks];
   const pitchedTrackNames = ['bass', 'lead', 'pad'];
+
+  // Collect unique section types for per-section generation
+  const uniqueSections = [];
+  const seenNames = new Set();
+  for (const s of sections) {
+    // Normalize section names (verse2 -> verse for bass style matching)
+    const baseName = s.name.replace(/\d+$/, '');
+    if (!seenNames.has(s.name)) {
+      seenNames.add(s.name);
+      uniqueSections.push({ name: s.name, baseName, energy: s.energy });
+    }
+  }
 
   for (const name of pitchedTrackNames) {
     if (requestedTracks && !requestedTracks.includes(name) && !requestedTracks.includes('all')) continue;
     if (!allNeeded.has(name) && !requestedTracks) continue;
 
     if (name === 'bass') {
-      tracks.push(generateBass({ ...pitchedOpts, seed: seed ? seed + 2 : undefined }));
+      // Generate bass per unique section type
+      const bassPatterns = {};
+      const bassSeed = seed ? seed + 2 : undefined;
+      for (const sec of uniqueSections) {
+        if (!(sec.name === 'drums' || sections.find(s => s.name === sec.name)?.tracks?.includes('bass'))) continue;
+        const bassSectionSeed = bassSeed ? bassSeed + uniqueSections.indexOf(sec) : undefined;
+        const bassTrack = generateBassForSection(
+          { ...pitchedOpts, seed: bassSectionSeed },
+          sec.baseName,
+          sec.energy
+        );
+        bassPatterns[sec.name] = bassTrack.pattern;
+      }
+      // Always ensure a 'main' key exists for fallback
+      if (!bassPatterns.main) {
+        const mainBass = generateBass({ ...pitchedOpts, seed: bassSeed });
+        bassPatterns.main = mainBass.pattern;
+      }
+      const refBass = generateBass({ ...pitchedOpts, seed: bassSeed });
+      tracks.push({
+        name: 'bass',
+        midiNote: refBass.midiNote,
+        channel: refBass.channel,
+        instrument: refBass.instrument,
+        patterns: bassPatterns,
+        pattern: bassPatterns.main || refBass.pattern,
+      });
     } else {
-      tracks.push(generateMelody({
-        ...pitchedOpts,
-        instrument: name,
-        seed: seed ? seed + 3 + pitchedTrackNames.indexOf(name) : undefined,
-      }));
+      // Melody/pad: generate sparse/main/dense variants
+      const instSeed = seed ? seed + 3 + pitchedTrackNames.indexOf(name) : undefined;
+      const mainTrack = generateMelody({
+        ...pitchedOpts, instrument: name, seed: instSeed,
+      });
+      const sparseTrack = generateMelody({
+        ...pitchedOpts, instrument: name,
+        seed: instSeed ? instSeed + 100 : undefined,
+        density: density * 0.5,
+      });
+      const denseTrack = generateMelody({
+        ...pitchedOpts, instrument: name,
+        seed: instSeed ? instSeed + 200 : undefined,
+        density: Math.min(1, density * 1.5),
+      });
+      tracks.push({
+        ...mainTrack,
+        patterns: {
+          main: mainTrack.pattern,
+          sparse: sparseTrack.pattern,
+          dense: denseTrack.pattern,
+        },
+      });
     }
   }
 
-  // Generate extra texture tracks based on variety
+  // ── Extra texture tracks: generate per section that uses them ──
   const extraTrackNames = GENRE_EXTRA_TRACKS[genre] || [];
   const numExtras = Math.round(variety * extraTrackNames.length);
   const selectedExtras = extraTrackNames.slice(0, numExtras);
@@ -210,24 +308,42 @@ export function generateArrangement(opts) {
     if (!allNeeded.has(extraName)) continue;
     if (requestedTracks && !requestedTracks.includes(extraName) && !requestedTracks.includes('all')) continue;
 
-    // Find the highest-energy section that uses this track to generate a representative pattern
-    const bestSection = sections
-      .filter(s => (s.tracks || []).includes(extraName))
-      .sort((a, b) => b.energy - a.energy)[0];
+    const sectionsUsingTrack = sections.filter(s => (s.tracks || []).includes(extraName));
+    if (sectionsUsingTrack.length === 0) continue;
 
-    const sectionName = bestSection ? bestSection.name : 'chorus';
-    const energy = bestSection ? bestSection.energy : 0.8;
+    const texturePatterns = {};
+    let refTrack = null;
 
-    tracks.push(generateTexture(extraName, {
-      resolution,
-      sectionName,
-      energy,
-      density,
-      seed: seed ? seed + extraSeedOffset++ : undefined,
-    }));
+    for (const sec of sectionsUsingTrack) {
+      const texSeed = seed ? seed + extraSeedOffset++ : undefined;
+      const texTrack = generateTexture(extraName, {
+        resolution,
+        sectionName: sec.name,
+        energy: sec.energy,
+        density,
+        seed: texSeed,
+      });
+      texturePatterns[sec.name] = texTrack.pattern;
+      if (!refTrack) refTrack = texTrack;
+    }
+
+    // Also generate a 'main' fallback from the highest-energy section
+    const bestSection = sectionsUsingTrack.sort((a, b) => b.energy - a.energy)[0];
+    if (!texturePatterns.main && bestSection) {
+      texturePatterns.main = texturePatterns[bestSection.name];
+    }
+
+    tracks.push({
+      name: refTrack.name,
+      midiNote: refTrack.midiNote,
+      channel: refTrack.channel,
+      instrument: refTrack.instrument,
+      patterns: texturePatterns,
+      pattern: texturePatterns.main || refTrack.pattern,
+    });
   }
 
-  // Build sections with activeTracks
+  // Build sections with activeTracks + patternVariant for drums and melody
   const arrangedSections = sections.map(s => {
     const activeTracks = (s.activeTracks || s.tracks).filter(t => {
       if (t === 'drums') return true;
@@ -239,13 +355,15 @@ export function generateArrangement(opts) {
       bars: s.bars,
       activeTracks,
       energy: s.energy,
+      drumVariant: SECTION_DRUM_VARIANT[s.name] || SECTION_DRUM_VARIANT[s.name.replace(/\d+$/, '')] || 'main',
+      melodyVariant: SECTION_MELODY_VARIANT[s.name] || SECTION_MELODY_VARIANT[s.name.replace(/\d+$/, '')] || 'main',
     };
   });
 
   const totalBars = arrangedSections.reduce((sum, s) => sum + s.bars, 0);
 
   return {
-    version: '2.0',
+    version: '2.1',
     key: `${key}${scale === 'minor' ? 'm' : ''}`,
     scale,
     tempo,
