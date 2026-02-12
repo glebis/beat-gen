@@ -1,0 +1,214 @@
+/* Beat-Gen Studio TUI Styles */
+
+Screen {
+    background: $surface;
+    min-width: 80;
+    min-height: 24;
+}
+
+/* ── Setup Screen ── */
+
+#setup-container {
+    padding: 1 2;
+}
+
+.setup-row {
+    height: 3;
+    layout: horizontal;
+    margin-bottom: 1;
+}
+
+.setup-row Label {
+    width: 14;
+    content-align-vertical: middle;
+}
+
+.setup-row Select, .setup-row Input {
+    width: 1fr;
+}
+
+#setup-actions {
+    height: auto;
+    align: center middle;
+    margin-top: 1;
+}
+
+#setup-actions Button {
+    margin: 0 1;
+}
+
+#setup-status {
+    height: 2;
+    color: $warning;
+    margin-top: 1;
+    padding: 0 2;
+}
+
+/* ── Arrangement Screen ── */
+
+#arrangement-container {
+    padding: 1 2;
+}
+
+#arrangement-table {
+    height: 1fr;
+    margin-bottom: 1;
+}
+
+#arrangement-summary {
+    height: 2;
+    text-style: bold;
+    margin: 1 0;
+}
+
+#arrangement-actions {
+    height: 3;
+    layout: horizontal;
+    align: center middle;
+}
+
+#arrangement-actions Button {
+    margin: 0 1;
+}
+
+/* ── Sound Design Screen ── */
+
+#sound-design-container {
+    layout: horizontal;
+    height: 1fr;
+}
+
+#instrument-panel {
+    width: 24;
+    border-right: tall $primary;
+    padding: 0 1;
+}
+
+#inst-panel-label {
+    text-style: bold;
+    padding: 0 0 1 0;
+}
+
+#instrument-list {
+    height: 1fr;
+}
+
+#detail-panel {
+    width: 1fr;
+    padding: 0 2;
+}
+
+#detail-header {
+    height: 2;
+    text-style: bold;
+    color: $text;
+    padding: 1 0 0 0;
+}
+
+#variant-list {
+    height: 8;
+    margin-bottom: 1;
+    border: round $primary;
+}
+
+#sample-info {
+    height: 2;
+    color: $text-muted;
+}
+
+#custom-prompt {
+    margin: 1 0;
+}
+
+#pitch-info {
+    height: 2;
+    color: $text-muted;
+}
+
+#prompt-label {
+    height: 1;
+}
+
+#generation-status {
+    height: 2;
+    color: $warning;
+    dock: bottom;
+    padding: 0 1;
+}
+
+/* ── Sample Editor ── */
+
+#editor-waveform {
+    height: 2;
+    color: $accent;
+    padding: 0 1;
+    margin: 1 0 0 0;
+}
+
+#editor-params {
+    height: auto;
+    padding: 0 1;
+}
+
+#editor-toggles {
+    height: 2;
+    padding: 0 1;
+}
+
+#editor-help {
+    height: 2;
+    padding: 0 1;
+    color: $text-muted;
+}
+
+/* ── Mixer Screen ── */
+
+#mixer-container {
+    padding: 1 2;
+}
+
+#mixer-header-row {
+    height: 1;
+    color: $text-muted;
+    text-style: bold;
+    padding: 0 0 0 0;
+}
+
+#mixer-tracks {
+    height: 1fr;
+    min-height: 6;
+    padding: 0;
+}
+
+#mixer-info {
+    height: 1;
+    margin-top: 1;
+    color: $text-muted;
+}
+
+#mixer-progress {
+    margin: 1 0 0 0;
+}
+
+#mixer-status {
+    height: 1;
+    margin: 0 0 1 0;
+}
+
+#mixer-help {
+    height: 1;
+    dock: bottom;
+    color: $text-muted;
+}
+
+/* ── Shared ── */
+
+.screen-header {
+    dock: top;
+    height: 1;
+    background: $primary;
+    color: $text;
+    text-style: bold;
+    padding: 0 2;
+    content-align-vertical: middle;
+}

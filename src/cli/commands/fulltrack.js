@@ -110,13 +110,15 @@ export async function fulltrackCommand(genre, options) {
 
   // ── Step 5: Render variants ──
   let mixConfig = null;
-  if (options.preset) {
+  const mixSource = options.mix || options.preset;
+  if (mixSource) {
     try {
-      mixConfig = await loadMixConfig(options.preset);
-      console.log(chalk.gray(`  Mix preset: ${options.preset}`));
+      mixConfig = await loadMixConfig(mixSource);
+      const label = options.mix ? `file: ${options.mix}` : `preset: ${options.preset}`;
+      console.log(chalk.gray(`  Mix: ${label}`));
     } catch (err) {
-      console.error(chalk.red(`Error loading preset: ${err.message}`));
-      console.log(chalk.yellow(`Available: ${listPresets().join(', ')}`));
+      console.error(chalk.red(`Error loading mix config: ${err.message}`));
+      console.log(chalk.yellow(`Available presets: ${listPresets().join(', ')}`));
       process.exit(1);
     }
   }

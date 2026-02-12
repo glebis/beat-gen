@@ -171,6 +171,7 @@ program
   .option('--variants <n>', 'Number of variant mixes to render', '3')
   .option('-s, --samples <dir>', 'Samples directory')
   .option('--preset <name>', 'Mix preset (clean, compressed, dub, pumping, heavy-sidechain)')
+  .option('-m, --mix <file>', 'Custom mix config JSON file')
   .option('-o, --output <dir>', 'Output directory', './data/output')
   .option('--api-key <key>', '11Labs API key (auto-generates samples if missing)')
   .option('--weirdness <n>', 'Experimental sound level 0-1', '0')
