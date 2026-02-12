@@ -666,9 +666,14 @@ export async function generateInstrumentKit(genre, options = {}) {
     };
   }
 
-  // Write samples.json metadata
+  // Merge with existing samples.json metadata (don't overwrite)
   const metadataPath = path.join(outputDir, 'samples.json');
-  await fs.writeFile(metadataPath, JSON.stringify(metadata, null, 2));
+  let existingMetadata = {};
+  try {
+    existingMetadata = JSON.parse(await fs.readFile(metadataPath, 'utf-8'));
+  } catch { /* no existing file */ }
+  const merged = { ...existingMetadata, ...metadata };
+  await fs.writeFile(metadataPath, JSON.stringify(merged, null, 2));
   console.log(`\nMetadata written: ${metadataPath}`);
 
   return { results: allResults, metadata, metadataPath };

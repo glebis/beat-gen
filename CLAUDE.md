@@ -4,7 +4,73 @@
 
 Beat-gen is a CLI music generator that creates multi-track arrangements with drums, bass, melody, pads, and 6 texture tracks. It outputs JSON patterns, MIDI files, PNG visualizations, and WAV audio.
 
-## Quick Reference
+## How to Use Beat-Gen (Prompting Guide)
+
+### Generating a Track (Pattern Only -- No Samples Needed)
+
+```bash
+# Basic: genre + key
+node bin/beat-gen.js track house --key C
+
+# Full control: all knobs
+node bin/beat-gen.js track uk-garage --key C --bpm 135 --seed 777 \
+  --variety 0.8 --density 0.6 --weirdness 0.5 --duration 120
+```
+
+Output: `data/output/<genre>-<bpm>bpm-<key>m/` containing pattern.json, pattern.mid, pattern.png
+
+### Generating Samples (Requires ELEVENLABS_API_KEY)
+
+```bash
+# Full instrument kit (bass, lead, pad + texture instruments)
+node bin/beat-gen.js sample --instruments --genre uk-garage --variants 3 --weirdness 0.5
+
+# Custom drum samples
+node bin/beat-gen.js sample "dusty kick trip-hop" "cracking snare dark" -o ./data/samples/trip-hop
+
+# Drum files MUST follow naming: {midiNote}-{name}*.mp3 or {name}.mp3
+# Examples: 36-kick-dusty.mp3, snare.mp3, 42-hihat-tight.mp3
+```
+
+### Full Pipeline (Generate + Render WAV)
+
+```bash
+# End-to-end: generates arrangement, uses existing samples, renders WAV
+node bin/beat-gen.js fulltrack uk-garage --key C --seed 777 \
+  --preset pumping --variants 3 --variety 0.8 --density 0.6 --weirdness 0.5 --duration 120
+```
+
+Output: mix.wav + per-track stems in `v1/`, `v2/`, `v3/` subdirectories
+
+### Available Genres
+
+`house`, `techno`, `dnb`, `breakbeat`, `uk-garage`, `idm`, `trip-hop`, `ostinato`, `reggae`
+
+### Key Format
+
+Key is just the root note: `C`, `D`, `Eb`, `F#`, `Bb`. NOT `Cm` or `Dm` -- scale defaults to minor.
+
+### Typical Workflow
+
+1. Generate pattern: `track <genre> --key <note> ...` (inspect PNG)
+2. Generate samples: `sample --instruments --genre <genre> --variants 3`
+3. Generate drums: `sample "kick <style>" "snare <style>" ... -o ./data/samples/<genre>`
+4. Rename drums to standard naming (36-kick, 38-snare, 42-hihat, 46-hihat-open, 37-rimshot, 39-clap)
+5. Render: `fulltrack <genre> --key <note> --preset pumping --variants 3`
+
+### Parameter Cheat Sheet
+
+| Want | Use |
+|------|-----|
+| More tracks/sections | `--variety 0.8-1.0` |
+| Sparse/minimal | `--density 0.2-0.3` |
+| Weird/experimental sounds | `--weirdness 0.6-1.0` |
+| Sidechain pump | `--preset pumping` |
+| Aggressive sidechain | `--preset heavy-sidechain` |
+| Reproducible output | `--seed <any-number>` |
+| Longer track | `--duration 180` (seconds) |
+
+## Quick Dev Reference
 
 ```bash
 npm install && npm link
